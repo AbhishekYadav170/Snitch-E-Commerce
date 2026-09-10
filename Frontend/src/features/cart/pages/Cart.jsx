@@ -64,7 +64,13 @@ const Cart = () => {
     /* ─── Helpers ─── */
     const getVariantDetails = (product, variantId) => {
         if (!product?.variants || !variantId) return null
-        return product.variants.find(v => v._id === variantId) ?? null
+        // The cart's backend aggregation already narrows `product.variants`
+        // down to the single matched variant object (not an array), so only
+        // call .find() when we actually have an array to search through.
+        if (Array.isArray(product.variants)) {
+            return product.variants.find(v => v._id === variantId) ?? null
+        }
+        return product.variants
     }
 
     const getDisplayImage = (product, variant) => {
@@ -503,140 +509,3 @@ export default Cart
 
 
 
-
-
-
-
-// import React, { useEffect } from 'react'
-// import { useSelector, useDispatch } from 'react-redux'
-// import { Link, useNavigate } from 'react-router'
-
-// import {
-//     incrementItemQuantity,
-//     decrementItemQuantity,
-//     removeItem
-// } from '../state/cart.slice'
-
-// const Cart = () => {
-
-//     const cartItems = useSelector(state => state.cart.items)
-//     const dispatch = useDispatch()
-//     const navigate = useNavigate()
-
-//     useEffect(() => {
-//         // optional: agar backend se load karna ho
-//     }, [])
-
-//     /* ─── Helpers ─── */
-//     const formatCurrency = (amount, currency = 'INR') =>
-//         `${currency} ${Number(amount).toLocaleString('en-IN')}`
-
-//     const subtotal = cartItems?.reduce((sum, item) => {
-//         return sum + (item.product?.price || 0) * (item.quantity || 1)
-//     }, 0)
-
-//     /* ─── Empty Cart ─── */
-//     if (!cartItems?.length) {
-//         return (
-//             <div className="min-h-screen flex flex-col items-center justify-center">
-//                 <h1>Your Cart is Empty</h1>
-//                 <Link to="/">Go Shopping</Link>
-//             </div>
-//         )
-//     }
-
-//     return (
-//         <div className="p-6">
-
-//             <h1 className="text-2xl mb-6">Your Cart</h1>
-
-//             {cartItems.map(item => {
-//                 const productId = item.product._id
-//                 const variantId = item.variant
-//                 const qty = item.quantity || 1
-
-//                 return (
-//                     <div
-//                         key={productId + variantId}
-//                         className="flex items-center justify-between border p-4 mb-4"
-//                     >
-//                         <div>
-//                             <h3>{item.product.name}</h3>
-//                             <p>₹ {item.product.price}</p>
-//                         </div>
-
-//                         {/* Quantity Controls */}
-//                         <div className="flex items-center gap-3">
-
-//                             {/* ➖ */}
-//                             <button
-//                                 onClick={() =>
-//                                     dispatch(decrementItemQuantity({
-//                                         productId,
-//                                         variantId
-//                                     }))
-//                                 }
-//                                 className="px-3 py-1 border"
-//                             >
-//                                 -
-//                             </button>
-
-//                             <span>{qty}</span>
-
-//                             {/* ➕ */}
-//                             <button
-//                                 onClick={() =>
-//                                     dispatch(incrementItemQuantity({
-//                                         productId,
-//                                         variantId
-//                                     }))
-//                                 }
-//                                 className="px-3 py-1 border"
-//                             >
-//                                 +
-//                             </button>
-//                         </div>
-
-//                         {/* Remove */}
-//                         <button
-//                             onClick={() =>
-//                                 dispatch(removeItem({
-//                                     productId,
-//                                     variantId
-//                                 }))
-//                             }
-//                             className="text-red-500"
-//                         >
-//                             Remove
-//                         </button>
-//                     </div>
-//                 )
-//             })}
-
-//             {/* Total */}
-//             <div className="mt-6 text-xl">
-//                 Total: ₹ {subtotal}
-//             </div>
-
-//             {/* Buttons */}
-//             <div className="mt-4 flex gap-4">
-//                 <button
-//                     className="bg-black text-white px-4 py-2"
-//                     onClick={() => alert("Proceed to checkout")}
-//                 >
-//                     Checkout
-//                 </button>
-
-//                 <button
-//                     className="border px-4 py-2"
-//                     onClick={() => navigate('/')}
-//                 >
-//                     Continue Shopping
-//                 </button>
-//             </div>
-
-//         </div>
-//     )
-// }
-
-// export default Cart
