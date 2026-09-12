@@ -1,3 +1,32 @@
+// import { param, body, validationResult } from "express-validator"
+
+
+// const validateRequest = (req, res, next) => {
+//     const errors = validationResult(req);
+//     if (!errors.isEmpty()) {
+//         return res.status(400).json({ errors: errors.array() });
+//     }
+//     next();
+// }
+
+
+// export const validateAddToCart = [
+//     param("productId").isMongoId().withMessage("Invalid product Id"),
+//     param("variantId").optional().isMongoId().withMessage("Invalid variant ID"),
+//     body("quantity").optional().isInt({ min:1 }).withMessage("Quanitity must be at least 1"),
+//     validateRequest
+// ]
+
+// export const validateIncrementCartItemQuantity = [
+//     param("productId").isMongoId().withMessage("Invalid product ID"),
+//     param("variantId").optional().isMongoId().withMessage("Invalid variant ID"),
+//     validateRequest
+// ]
+
+
+
+
+
 import { param, body, validationResult } from "express-validator"
 
 
@@ -18,6 +47,18 @@ export const validateAddToCart = [
 ]
 
 export const validateIncrementCartItemQuantity = [
+    param("productId").isMongoId().withMessage("Invalid product ID"),
+    param("variantId").optional().isMongoId().withMessage("Invalid variant ID"),
+    validateRequest
+]
+
+export const validateDecrementCartItemQuantity = [
+    param("productId").isMongoId().withMessage("Invalid product ID"),
+    param("variantId").optional().isMongoId().withMessage("Invalid variant ID"),
+    validateRequest
+]
+
+export const validateRemoveCartItem = [
     param("productId").isMongoId().withMessage("Invalid product ID"),
     param("variantId").optional().isMongoId().withMessage("Invalid variant ID"),
     validateRequest

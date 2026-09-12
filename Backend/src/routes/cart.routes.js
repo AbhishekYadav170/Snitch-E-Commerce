@@ -1,7 +1,50 @@
+// import express from 'express';
+// import { authenticateUser} from '../middlewares/auth.middleware.js'
+// import { validateAddToCart, validateIncrementCartItemQuantity } from '../validator/cart.validator.js';
+// import { addToCart, getCart, incrementCartItemQuantity } from '../controllers/cart.controller.js';
+
+
+// //const router = express.Router();
+
+
+// const router = express.Router();
+
+// /**
+//  * @route Post /api/cart/add/:productId/:variantId
+//  * @desc Add item to cart
+//  * @access Private
+//  * @arguement productId - ID of the product to add
+//  * @argument variantid - ID of the variant to add
+//  * @argument quantity - Quantity of the item to add (optional, default: 1)
+//  */
+// router.post("/add/:productId/:variantId", authenticateUser, validateAddToCart, addToCart)
+
+
+// /**
+//  * @route GET /api/cart
+//  * @desc Get user's cart
+//  * @access Private
+//  */
+// router.get('/', authenticateUser, getCart)
+
+// /**
+//  * @route PATCH /api/cart/quantity/increment/:productId/:variantId
+//  * @desc Increment quantity of an item in the cart 
+//  * @access Private 
+//  * @argument productId - Id of the product to update
+//  * @argument variantId - Id of the variant to update
+//  * 
+//  */
+// router.patch("/quantity/increment/:productId/:variantId", authenticateUser, validateIncrementCartItemQuantity, incrementCartItemQuantity)
+
+// export default router;
+
+
+
 import express from 'express';
 import { authenticateUser} from '../middlewares/auth.middleware.js'
-import { validateAddToCart, validateIncrementCartItemQuantity } from '../validator/cart.validator.js';
-import { addToCart, getCart, incrementCartItemQuantity } from '../controllers/cart.controller.js';
+import { validateAddToCart, validateIncrementCartItemQuantity, validateDecrementCartItemQuantity, validateRemoveCartItem } from '../validator/cart.validator.js';
+import { addToCart, getCart, incrementCartItemQuantity, decrementCartItemQuantity, removeCartItem } from '../controllers/cart.controller.js';
 
 
 //const router = express.Router();
@@ -36,5 +79,19 @@ router.get('/', authenticateUser, getCart)
  * 
  */
 router.patch("/quantity/increment/:productId/:variantId", authenticateUser, validateIncrementCartItemQuantity, incrementCartItemQuantity)
+
+/**
+ * @route PATCH /api/cart/quantity/decrement/:productId/:variantId
+ * @desc Decrement quantity of an item in the cart (removes it if quantity hits 0)
+ * @access Private
+ */
+router.patch("/quantity/decrement/:productId/:variantId", authenticateUser, validateDecrementCartItemQuantity, decrementCartItemQuantity)
+
+/**
+ * @route DELETE /api/cart/remove/:productId/:variantId
+ * @desc Remove an item from the cart entirely
+ * @access Private
+ */
+router.delete("/remove/:productId/:variantId", authenticateUser, validateRemoveCartItem, removeCartItem)
 
 export default router;

@@ -1,31 +1,143 @@
-import React from 'react'
+// import React from 'react'
+// import { useSelector } from 'react-redux'
+// import { useNavigate, Link } from 'react-router'
+
+// const Nav = () => {
+//     const navigate = useNavigate()
+//     const user = useSelector(state => state.auth.user)
+//     const cartItems = useSelector(state => state.cart?.items)
+
+//     return (
+//         <nav className="px-8 lg:px-16 xl:px-24 pt-10 pb-6 flex items-center justify-between border-b" style={{ borderColor: '#e4e2df' }}>
+//             <Link to="/"
+//                 className="text-sm font-medium tracking-[0.35em] uppercase hover:opacity-80 transition-opacity"
+//                 style={{ fontFamily: "'Cormorant Garamond', serif", color: '#C9A96E' }}
+//             >
+//                 Snitch.
+//             </Link>
+//             <div className="flex gap-6 items-center text-[10px] uppercase tracking-[0.2em] font-medium" style={{ color: '#7A6E63' }}>
+//                 {user ? (
+//                     <>
+//                         <span style={{ color: '#1b1c1a' }}>{user.fullname}</span>
+//                         {user.role === 'seller' && (
+//                             <Link to="/seller/dashboard" className="transition-colors hover:text-[#C9A96E]">Seller Dashboard</Link>
+//                         )}
+//                         <Link
+//                             to="/cart"
+//                             className="relative flex items-center hover:opacity-70 transition-opacity"
+//                             style={{ color: '#1b1c1a' }}
+//                             aria-label="Shopping cart"
+//                         >
+//                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+//                                 <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+//                                 <line x1="3" y1="6" x2="21" y2="6" />
+//                                 <path d="M16 10a4 4 0 0 1-8 0" />
+//                             </svg>
+//                             {cartItems?.length > 0 && (
+//                                 <span
+//                                     className="absolute -top-2 -right-2 flex items-center justify-center rounded-full text-white"
+//                                     style={{
+//                                         backgroundColor: '#C9A96E',
+//                                         width: '16px',
+//                                         height: '16px',
+//                                         fontSize: '9px',
+//                                         fontFamily: "'Inter', sans-serif",
+//                                         fontWeight: 600,
+//                                         letterSpacing: 0,
+//                                     }}
+//                                 >
+//                                     {cartItems.length > 9 ? '9+' : cartItems.length}
+//                                 </span>
+//                             )}
+//                         </Link>
+//                     </>
+//                 ) : (
+//                     <>
+//                         <Link to="/login" className="transition-colors hover:text-[#C9A96E]">Sign In</Link>
+//                         <Link to="/register" className="transition-colors hover:text-[#C9A96E]">Sign Up</Link>
+//                     </>
+//                 )}
+//             </div>
+//         </nav>
+//     )
+// }
+
+// export default Nav
+
+
+
+import React, { useState, useRef, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { useNavigate, Link } from 'react-router'
+import { useAuth } from '../../auth/hook/useAuth'
+
+const tokens = {
+    surface: '#fbf9f6',
+    onSurface: '#1b1c1a',
+    secondary: '#7A6E63',
+    muted: '#B5ADA3',
+    primary: '#C9A96E',
+    outlineVariant: '#e4e2df',
+}
 
 const Nav = () => {
     const navigate = useNavigate()
     const user = useSelector(state => state.auth.user)
     const cartItems = useSelector(state => state.cart?.items)
+    const { handleLogout } = useAuth()
+
+    const [ menuOpen, setMenuOpen ] = useState(false)
+    const menuRef = useRef(null)
+
+    useEffect(() => {
+        function handleClickOutside(e) {
+            if (menuRef.current && !menuRef.current.contains(e.target)) {
+                setMenuOpen(false)
+            }
+        }
+        document.addEventListener('mousedown', handleClickOutside)
+        return () => document.removeEventListener('mousedown', handleClickOutside)
+    }, [])
+
+    const onLogout = async () => {
+        setMenuOpen(false)
+        await handleLogout()
+        navigate('/login')
+    }
+
+    const initials = user?.fullname
+        ?.split(' ')
+        .filter(Boolean)
+        .slice(0, 2)
+        .map(w => w[ 0 ]?.toUpperCase())
+        .join('') || '?'
 
     return (
-        <nav className="px-8 lg:px-16 xl:px-24 pt-10 pb-6 flex items-center justify-between border-b" style={{ borderColor: '#e4e2df' }}>
+        <nav
+            className="sticky top-0 z-30 px-8 lg:px-16 xl:px-24 py-5 flex items-center justify-between border-b backdrop-blur-md"
+            style={{ borderColor: tokens.outlineVariant, backgroundColor: `${tokens.surface}e6` }}
+        >
             <Link to="/"
-                className="text-sm font-medium tracking-[0.35em] uppercase hover:opacity-80 transition-opacity"
-                style={{ fontFamily: "'Cormorant Garamond', serif", color: '#C9A96E' }}
+                className="text-lg font-medium tracking-[0.35em] uppercase hover:opacity-80 transition-opacity"
+                style={{ fontFamily: "'Cormorant Garamond', serif", color: tokens.primary }}
             >
                 Snitch.
             </Link>
-            <div className="flex gap-6 items-center text-[10px] uppercase tracking-[0.2em] font-medium" style={{ color: '#7A6E63' }}>
+
+            <div className="flex gap-7 items-center text-[10px] uppercase tracking-[0.2em] font-medium" style={{ color: tokens.secondary }}>
+                <Link to="/" className="hidden sm:inline transition-colors hover:text-[#C9A96E]">Home</Link>
+
                 {user ? (
                     <>
-                        <span style={{ color: '#1b1c1a' }}>{user.fullname}</span>
                         {user.role === 'seller' && (
-                            <Link to="/seller/dashboard" className="transition-colors hover:text-[#C9A96E]">Seller Dashboard</Link>
+                            <Link to="/seller/dashboard" className="hidden sm:inline transition-colors hover:text-[#C9A96E]">Seller Dashboard</Link>
                         )}
+
+                        {/* Cart */}
                         <Link
                             to="/cart"
                             className="relative flex items-center hover:opacity-70 transition-opacity"
-                            style={{ color: '#1b1c1a' }}
+                            style={{ color: tokens.onSurface }}
                             aria-label="Shopping cart"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -37,7 +149,7 @@ const Nav = () => {
                                 <span
                                     className="absolute -top-2 -right-2 flex items-center justify-center rounded-full text-white"
                                     style={{
-                                        backgroundColor: '#C9A96E',
+                                        backgroundColor: tokens.primary,
                                         width: '16px',
                                         height: '16px',
                                         fontSize: '9px',
@@ -50,11 +162,80 @@ const Nav = () => {
                                 </span>
                             )}
                         </Link>
+
+                        {/* User menu */}
+                        <div className="relative" ref={menuRef}>
+                            <button
+                                onClick={() => setMenuOpen(o => !o)}
+                                className="flex items-center gap-2 cursor-pointer"
+                                aria-label="Account menu"
+                            >
+                                <span
+                                    className="flex items-center justify-center rounded-full font-semibold"
+                                    style={{
+                                        width: '28px',
+                                        height: '28px',
+                                        backgroundColor: tokens.primary,
+                                        color: '#fff',
+                                        fontSize: '10px',
+                                        letterSpacing: 0,
+                                        fontFamily: "'Inter', sans-serif",
+                                    }}
+                                >
+                                    {initials}
+                                </span>
+                                <span className="hidden md:inline normal-case tracking-normal text-[13px]" style={{ color: tokens.onSurface, fontFamily: "'Inter', sans-serif" }}>
+                                    {user.fullname}
+                                </span>
+                            </button>
+
+                            {menuOpen && (
+                                <div
+                                    className="absolute right-0 mt-3 w-44 py-2 shadow-[0_16px_32px_rgba(27,28,26,0.12)] normal-case tracking-normal"
+                                    style={{ backgroundColor: '#ffffff', border: `1px solid ${tokens.outlineVariant}` }}
+                                >
+                                    <div className="px-4 py-2 text-[11px] uppercase tracking-[0.18em]" style={{ color: tokens.muted }}>
+                                        {user.role === 'seller' ? 'Seller Account' : 'My Account'}
+                                    </div>
+                                    <Link
+                                        to="/cart"
+                                        onClick={() => setMenuOpen(false)}
+                                        className="block px-4 py-2 text-sm hover:bg-[#f5f3f0] transition-colors"
+                                        style={{ color: tokens.onSurface, fontFamily: "'Inter', sans-serif" }}
+                                    >
+                                        My Cart
+                                    </Link>
+                                    {user.role === 'seller' && (
+                                        <Link
+                                            to="/seller/dashboard"
+                                            onClick={() => setMenuOpen(false)}
+                                            className="block px-4 py-2 text-sm hover:bg-[#f5f3f0] transition-colors"
+                                            style={{ color: tokens.onSurface, fontFamily: "'Inter', sans-serif" }}
+                                        >
+                                            Seller Dashboard
+                                        </Link>
+                                    )}
+                                    <button
+                                        onClick={onLogout}
+                                        className="w-full text-left block px-4 py-2 text-sm hover:bg-[#fbeaea] transition-colors cursor-pointer"
+                                        style={{ color: '#ba1a1a', fontFamily: "'Inter', sans-serif" }}
+                                    >
+                                        Logout
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                     </>
                 ) : (
                     <>
                         <Link to="/login" className="transition-colors hover:text-[#C9A96E]">Sign In</Link>
-                        <Link to="/register" className="transition-colors hover:text-[#C9A96E]">Sign Up</Link>
+                        <Link
+                            to="/register"
+                            className="px-5 py-2.5 transition-colors"
+                            style={{ backgroundColor: tokens.onSurface, color: tokens.surface }}
+                        >
+                            Sign Up
+                        </Link>
                     </>
                 )}
             </div>
