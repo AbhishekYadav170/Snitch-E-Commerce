@@ -1,11 +1,8 @@
 
 
-
-
-
-
 import React, { useEffect, useState, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router';
+import { useSelector } from 'react-redux';
 import { useProduct } from '../hooks/useProduct';
 import { useCart } from '../../cart/hook/useCart';
 
@@ -15,9 +12,12 @@ const ProductDetail = () => {
     const [ product, setProduct ] = useState(null);
     const [ selectedImage, setSelectedImage ] = useState(0);
     const [ selectedAttributes, setSelectedAttributes ] = useState({});
+    const [ isAddingToCart, setIsAddingToCart ] = useState(false);
+    const [ cartMessage, setCartMessage ] = useState(null); // { type: 'success' | 'error', text: string }
     const navigate = useNavigate();
     const { handleGetProductById } = useProduct();
     const { handleAddItem } =useCart()
+    const user = useSelector(state => state.auth.user);
 
     async function fetchProductDetails() {
         try {
@@ -110,6 +110,7 @@ const activeVariant = useMemo(() => {
 
     useEffect(() => {
         setSelectedImage(0);
+        setCartMessage(null);
     }, [activeVariant]);
 
     const handleAttributeChange = (attrName, value) => {
@@ -133,6 +134,47 @@ const activeVariant = useMemo(() => {
                 setSelectedAttributes(newAttrs);
             }
         }
+    };
+
+    const addToCart = async () => {
+        if (!user) {
+            navigate('/login');
+            return false;
+        }
+
+        if (!activeVariant) {
+            setCartMessage({ type: 'error', text: 'Please select an option before adding to cart.' });
+            return false;
+        }
+
+        if (activeVariant.stock !== undefined && activeVariant.stock <= 0) {
+            setCartMessage({ type: 'error', text: 'This item is currently out of stock.' });
+            return false;
+        }
+
+        setCartMessage(null);
+        setIsAddingToCart(true);
+        try {
+            await handleAddItem({
+                productId: product._id,
+                variantId: activeVariant._id
+            });
+            setCartMessage({ type: 'success', text: 'Added to your cart.' });
+            return true;
+        } catch (error) {
+            setCartMessage({
+                type: 'error',
+                text: error?.response?.data?.message || 'Could not add this item to cart. Please try again.'
+            });
+            return false;
+        } finally {
+            setIsAddingToCart(false);
+        }
+    };
+
+    const handleBuyNow = async () => {
+        const added = await addToCart();
+        if (added) navigate('/cart');
     };
 
     if (!product) {
@@ -267,28 +309,61 @@ const activeVariant = useMemo(() => {
                             <div className="h-px w-full mb-8" style={{ backgroundColor: '#e4e2df' }} />
 
                             {/* Options/Variants */}
-                            {Object.entries(availableAttributes).map(([attrName, values]) => (
-                                <div key={attrName} className="mb-6">
-                                    <h3 className="text-[10px] uppercase tracking-[0.24em] font-medium mb-3" style={{ color: '#C9A96E' }}>
-                                        {attrName}
-                                    </h3>
-                                    <div className="flex flex-wrap gap-2">
-                                        {values.map(val => {
-                                            const isSelected = selectedAttributes[attrName] === val;
-                                            return (
-                                                <button
-                                                    key={val}
-                                                    onClick={() => handleAttributeChange(attrName, val)}
-                                                    className={`px-4 py-2 text-[11px] uppercase tracking-[0.15em] font-medium transition-all duration-300 border ${isSelected ? 'border-[#1b1c1a] bg-[#1b1c1a] text-[#fbf9f6]' : 'border-[#d0c5b5] text-[#1b1c1a] hover:border-[#1b1c1a]'}`}
-                                                    style={isSelected ? {} : { backgroundColor: 'transparent' }}
-                                                >
-                                                    {val}
-                                                </button>
-                                            );
-                                        })}
+                            {Object.entries(availableAttributes).map(([attrName, values]) => {
+                                const isColor = attrName.toLowerCase().includes('color') || attrName.toLowerCase().includes('colour');
+                                return (
+                                    <div key={attrName} className="mb-6">
+                                        <h3 className="text-[10px] uppercase tracking-[0.24em] font-medium mb-3" style={{ color: '#C9A96E' }}>
+                                            {attrName}{isColor && selectedAttributes[attrName] ? `: ${selectedAttributes[attrName]}` : ''}
+                                        </h3>
+
+                                        {isColor ? (
+                                            <div className="flex flex-wrap gap-3">
+                                                {values.map(val => {
+                                                    const isSelected = selectedAttributes[attrName] === val;
+                                                    return (
+                                                        <button
+                                                            key={val}
+                                                            onClick={() => handleAttributeChange(attrName, val)}
+                                                            title={val}
+                                                            aria-label={val}
+                                                            className="w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200"
+                                                            style={{
+                                                                border: isSelected ? '2px solid #1b1c1a' : '1px solid #d0c5b5',
+                                                                padding: '2px',
+                                                            }}
+                                                        >
+                                                            <span
+                                                                className="w-full h-full rounded-full block"
+                                                                style={{
+                                                                    backgroundColor: val.toLowerCase().replace(/\s+/g, ''),
+                                                                    boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.12)',
+                                                                }}
+                                                            />
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
+                                        ) : (
+                                            <div className="flex flex-wrap gap-2">
+                                                {values.map(val => {
+                                                    const isSelected = selectedAttributes[attrName] === val;
+                                                    return (
+                                                        <button
+                                                            key={val}
+                                                            onClick={() => handleAttributeChange(attrName, val)}
+                                                            className={`min-w-[44px] px-3 py-2 text-[11px] uppercase tracking-[0.1em] font-medium transition-all duration-300 border ${isSelected ? 'border-[#1b1c1a] bg-[#1b1c1a] text-[#fbf9f6]' : 'border-[#d0c5b5] text-[#1b1c1a] hover:border-[#1b1c1a]'}`}
+                                                            style={isSelected ? {} : { backgroundColor: 'transparent' }}
+                                                        >
+                                                            {val}
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
+                                        )}
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
 
                             {/* Stock Information */}
                             {activeVariant && activeVariant.stock !== undefined && (
@@ -310,53 +385,49 @@ const activeVariant = useMemo(() => {
 
                             {/* Actions */}
                             <div className="flex flex-col gap-4 mt-auto">
+                                {cartMessage && (
+                                    <div
+                                        className="text-[11px] uppercase tracking-[0.15em] font-medium px-4 py-3 border"
+                                        style={
+                                            cartMessage.type === 'success'
+                                                ? { backgroundColor: '#eef4ea', borderColor: '#a9c79a', color: '#3d5a34' }
+                                                : { backgroundColor: '#fbeaea', borderColor: '#e0a8a8', color: '#8a2d2d' }
+                                        }
+                                    >
+                                        {cartMessage.text}
+                                    </div>
+                                )}
+
                                 <button
-                                    className="w-full py-4 text-[11px] uppercase tracking-[0.25em] font-medium transition-all duration-300"
+                                    disabled={isAddingToCart || (activeVariant?.stock !== undefined && activeVariant.stock <= 0)}
+                                    className="w-full py-4 text-[11px] uppercase tracking-[0.25em] font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                                     style={{
                                         backgroundColor: '#1b1c1a',
                                         color: '#fbf9f6',
                                         fontFamily: "'Inter', sans-serif"
                                     }}
                                     onMouseEnter={e => {
+                                        if (e.currentTarget.disabled) return;
                                         e.currentTarget.style.backgroundColor = '#C9A96E';
                                         e.currentTarget.style.color = '#1b1c1a';
                                     }}
                                     onMouseLeave={e => {
+                                        if (e.currentTarget.disabled) return;
                                         e.currentTarget.style.backgroundColor = '#1b1c1a';
                                         e.currentTarget.style.color = '#fbf9f6';
                                     }}
-
-                                    // onClick={() => {
-                                    //     handleAddItem({
-                                    //         productId: product._id,
-                                    //         variantId: activeVariant._id
-                                    //     })
-                                    // }}
-                                    onClick={() => {
-                                        console.log("Clicked");
-                                        console.log("product:", product);
-                                        console.log("activeVariant:", activeVariant);
-
-                                       if (!product) {
-                                            console.log("❌ product is null");
-                                            return;
-                                        }
-
-                                        if (!activeVariant) {
-                                             console.log("❌ activeVariant is null");
-                                             return;
-                                        }
-                                        handleAddItem({
-                                            productId: product._id,
-                                            variantId: activeVariant._id
-                                        })
-                                    }}
+                                    onClick={addToCart}
                                 >
-                                    Add to Cart
+                                    {isAddingToCart
+                                        ? 'Adding...'
+                                        : (activeVariant?.stock !== undefined && activeVariant.stock <= 0)
+                                            ? 'Out of Stock'
+                                            : 'Add to Cart'}
                                 </button>
 
                                 <button
-                                    className="w-full py-4 text-[11px] uppercase tracking-[0.25em] font-medium transition-all duration-300 border"
+                                    disabled={isAddingToCart || (activeVariant?.stock !== undefined && activeVariant.stock <= 0)}
+                                    className="w-full py-4 text-[11px] uppercase tracking-[0.25em] font-medium transition-all duration-300 border disabled:opacity-50 disabled:cursor-not-allowed"
                                     style={{
                                         backgroundColor: 'transparent',
                                         borderColor: '#d0c5b5',
@@ -364,11 +435,14 @@ const activeVariant = useMemo(() => {
                                         fontFamily: "'Inter', sans-serif"
                                     }}
                                     onMouseEnter={e => {
+                                        if (e.currentTarget.disabled) return;
                                         e.currentTarget.style.borderColor = '#C9A96E';
                                     }}
                                     onMouseLeave={e => {
+                                        if (e.currentTarget.disabled) return;
                                         e.currentTarget.style.borderColor = '#d0c5b5';
                                     }}
+                                    onClick={handleBuyNow}
                                 >
                                     Buy Now
                                 </button>

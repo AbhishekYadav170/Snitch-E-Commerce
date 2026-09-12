@@ -1,5 +1,4 @@
 
-
 import React, { useEffect } from 'react';
 import { useProduct } from '../hooks/useProduct';
 import { useSelector } from 'react-redux';
@@ -13,6 +12,16 @@ const Dashboard = () => {
     useEffect(() => {
         handleGetSellerProduct();
     }, []);
+
+    const totalProducts = sellerProducts?.length ?? 0;
+    const totalVariants = sellerProducts?.reduce((sum, p) => sum + (p.variants?.length ?? 0), 0) ?? 0;
+    const totalStock = sellerProducts?.reduce(
+        (sum, p) => sum + (p.variants?.reduce((s, v) => s + (v.stock ?? 0), 0) ?? 0),
+        0
+    ) ?? 0;
+    const outOfStockCount = sellerProducts?.filter(
+        p => (p.variants?.length ?? 0) > 0 && p.variants.every(v => (v.stock ?? 0) <= 0)
+    ).length ?? 0;
 
     return (
         <>
@@ -82,6 +91,32 @@ const Dashboard = () => {
                         </button>
                     </div>
 
+                    {/* ── Stats Row ── */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pb-14">
+                        {[
+                            { label: 'Listings', value: totalProducts },
+                            { label: 'Variants', value: totalVariants },
+                            { label: 'Units in Stock', value: totalStock },
+                            { label: 'Out of Stock', value: outOfStockCount },
+                        ].map((stat, i) => (
+                            <div
+                                key={i}
+                                className="px-6 py-6 border flex flex-col gap-1"
+                                style={{ borderColor: '#e4e2df', backgroundColor: '#ffffff' }}
+                            >
+                                <span
+                                    className="text-3xl font-light"
+                                    style={{ fontFamily: "'Cormorant Garamond', serif", color: '#1b1c1a' }}
+                                >
+                                    {stat.value}
+                                </span>
+                                <span className="text-[10px] uppercase tracking-[0.2em]" style={{ color: '#7A6E63' }}>
+                                    {stat.label}
+                                </span>
+                            </div>
+                        ))}
+                    </div>
+
                     {/* ── Product Grid ── */}
                     {sellerProducts && sellerProducts.length > 0 ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-16 pb-24">
@@ -90,17 +125,29 @@ const Dashboard = () => {
                                     ? product.images[ 0 ].url
                                     : '/snitch_editorial_warm.png'; // Fallback to our warm editorial
 
+                                const variantCount = product.variants?.length ?? 0;
+                                const stockTotal = product.variants?.reduce((s, v) => s + (v.stock ?? 0), 0) ?? 0;
+                                const isOutOfStock = variantCount > 0 && stockTotal === 0;
+
                                 return (
                                     <div
                                         onClick={() => { navigate(`/seller/product/${product._id}`) }}
                                         key={product._id} className="group cursor-pointer flex flex-col">
                                         {/* Image Container */}
-                                        <div className="aspect-[4/5] overflow-hidden mb-6" style={{ backgroundColor: '#f5f3f0' }}>
+                                        <div className="relative aspect-[4/5] overflow-hidden mb-6" style={{ backgroundColor: '#f5f3f0' }}>
                                             <img
                                                 src={imageUrl}
                                                 alt={product.title}
                                                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                                             />
+                                            {isOutOfStock && (
+                                                <span
+                                                    className="absolute top-3 left-3 text-[9px] uppercase tracking-[0.15em] font-semibold px-2.5 py-1"
+                                                    style={{ backgroundColor: '#8a2d2d', color: '#fff' }}
+                                                >
+                                                    Out of Stock
+                                                </span>
+                                            )}
                                         </div>
 
                                         {/* Product Details */}
@@ -121,12 +168,15 @@ const Dashboard = () => {
                                                 {product.description}
                                             </p>
 
-                                            <div className="mt-2">
+                                            <div className="flex items-center justify-between mt-2">
                                                 <span
                                                     className="text-[10px] uppercase tracking-[0.2em] font-medium"
                                                     style={{ color: '#1b1c1a' }}
                                                 >
                                                     {product.price?.currency} {product.price?.amount?.toLocaleString()}
+                                                </span>
+                                                <span className="text-[10px] tracking-[0.1em]" style={{ color: '#B5ADA3' }}>
+                                                    {variantCount} variant{variantCount !== 1 ? 's' : ''} · {stockTotal} in stock
                                                 </span>
                                             </div>
                                         </div>
