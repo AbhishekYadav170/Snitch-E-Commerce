@@ -46,15 +46,50 @@ const Login = () => {
     return (
         <div className="min-h-screen bg-[#0e0e0e] text-[#e5e2e1] font-sans selection:bg-[#FFD700] selection:text-[#131313] flex flex-col lg:flex-row">
 
-            {/* Split Screen - Left Image Section (Hidden on mobile, visible on lg screens) */}
+            {/* Split Screen - Left Visual Section (Hidden on mobile, visible on lg screens) */}
             <div className="hidden lg:flex lg:w-1/2 relative bg-[#131313] items-center justify-center overflow-hidden border-r border-[#1c1b1b]">
-                <img
-                    src="/snitch_editorial.png"
-                    alt="Snitch Fashion Editorial"
-                    className="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-luminosity hover:scale-105 transition-transform duration-[20s] ease-out"
-                />
+                {/* Abstract editorial artwork (no external image dependency) */}
+                <svg
+                    className="absolute inset-0 w-full h-full"
+                    viewBox="0 0 800 1000"
+                    preserveAspectRatio="xMidYMid slice"
+                    xmlns="http://www.w3.org/2000/svg"
+                >
+                    <defs>
+                        <linearGradient id="loginGoldFade" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stopColor="#FFD700" stopOpacity="0.5" />
+                            <stop offset="100%" stopColor="#FFD700" stopOpacity="0" />
+                        </linearGradient>
+                    </defs>
+                    <rect width="800" height="1000" fill="#131313" />
+                    <circle cx="620" cy="220" r="260" fill="url(#loginGoldFade)" />
+                    {Array.from({ length: 14 }).map((_, i) => (
+                        <line
+                            key={i}
+                            x1={-100 + i * 70}
+                            y1="1000"
+                            x2={200 + i * 70}
+                            y2="0"
+                            stroke="#FFD700"
+                            strokeOpacity="0.06"
+                            strokeWidth="1"
+                        />
+                    ))}
+                    <text
+                        x="50%"
+                        y="640"
+                        textAnchor="middle"
+                        fontFamily="'Cormorant Garamond', serif"
+                        fontSize="340"
+                        fill="#FFD700"
+                        fillOpacity="0.08"
+                        fontStyle="italic"
+                    >
+                        S
+                    </text>
+                </svg>
 
-                {/* Gradient overlays to merge image nicely into the dark background */}
+                {/* Gradient overlays to merge the artwork nicely into the dark background */}
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0e0e0e] via-transparent to-transparent opacity-90"></div>
                 <div className="absolute inset-0 bg-gradient-to-r from-[#0e0e0e]/50 via-transparent to-[#0e0e0e] opacity-90"></div>
 

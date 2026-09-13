@@ -4,12 +4,12 @@ import { useNavigate, Link } from 'react-router'
 import { useAuth } from '../../auth/hook/useAuth'
 
 const tokens = {
-    surface: '#fbf9f6',
-    onSurface: '#1b1c1a',
-    secondary: '#7A6E63',
-    muted: '#B5ADA3',
+    surface: '#141311',
+    onSurface: '#f3efe8',
+    secondary: '#a89e8d',
+    muted: '#7d7568',
     primary: '#C9A96E',
-    outlineVariant: '#e4e2df',
+    outlineVariant: '#302b23',
 }
 
 const Nav = () => {
@@ -123,8 +123,8 @@ const Nav = () => {
 
                             {menuOpen && (
                                 <div
-                                    className="absolute right-0 mt-3 w-44 py-2 shadow-[0_16px_32px_rgba(27,28,26,0.12)] normal-case tracking-normal"
-                                    style={{ backgroundColor: '#ffffff', border: `1px solid ${tokens.outlineVariant}` }}
+                                    className="absolute right-0 mt-3 w-44 py-2 shadow-[0_16px_32px_rgba(0,0,0,0.4)] normal-case tracking-normal"
+                                    style={{ backgroundColor: '#1c1a16', border: `1px solid ${tokens.outlineVariant}` }}
                                 >
                                     <div className="px-4 py-2 text-[11px] uppercase tracking-[0.18em]" style={{ color: tokens.muted }}>
                                         {user.role === 'seller' ? 'Seller Account' : 'My Account'}
@@ -132,7 +132,7 @@ const Nav = () => {
                                     <Link
                                         to="/cart"
                                         onClick={() => setMenuOpen(false)}
-                                        className="block px-4 py-2 text-sm hover:bg-[#f5f3f0] transition-colors"
+                                        className="block px-4 py-2 text-sm hover:bg-[#26221c] transition-colors"
                                         style={{ color: tokens.onSurface, fontFamily: "'Inter', sans-serif" }}
                                     >
                                         My Cart
@@ -141,7 +141,7 @@ const Nav = () => {
                                         <Link
                                             to="/seller/dashboard"
                                             onClick={() => setMenuOpen(false)}
-                                            className="block px-4 py-2 text-sm hover:bg-[#f5f3f0] transition-colors"
+                                            className="block px-4 py-2 text-sm hover:bg-[#26221c] transition-colors"
                                             style={{ color: tokens.onSurface, fontFamily: "'Inter', sans-serif" }}
                                         >
                                             Seller Dashboard
@@ -149,8 +149,8 @@ const Nav = () => {
                                     )}
                                     <button
                                         onClick={onLogout}
-                                        className="w-full text-left block px-4 py-2 text-sm hover:bg-[#fbeaea] transition-colors cursor-pointer"
-                                        style={{ color: '#ba1a1a', fontFamily: "'Inter', sans-serif" }}
+                                        className="w-full text-left block px-4 py-2 text-sm hover:bg-[#331c1c] transition-colors cursor-pointer"
+                                        style={{ color: '#ff6b6b', fontFamily: "'Inter', sans-serif" }}
                                     >
                                         Logout
                                     </button>

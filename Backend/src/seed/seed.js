@@ -97,9 +97,12 @@ const CATALOG = [
 async function run() {
     await connectDB()
 
-    // 1. Ensure a demo seller account exists
+    // 1. Prefer attaching demo products to an ALREADY EXISTING seller account
+    //    (so they show up in that seller's own dashboard and can be managed/
+    //    deleted from there). Falls back to creating a demo seller only if
+    //    no seller account exists yet in the database.
     const sellerEmail = "seller@snitch.demo"
-    let seller = await userModel.findOne({ email: sellerEmail })
+    let seller = await userModel.findOne({ role: "seller" }).sort({ createdAt: 1 })
 
     if (!seller) {
         seller = await userModel.create({
@@ -109,14 +112,16 @@ async function run() {
             contact: "9999999999",
             role: "seller",
         })
-        console.log(`Created demo seller account (${sellerEmail} / Seller@123)`)
+        console.log(`No seller account found — created a demo one (${sellerEmail} / Seller@123)`)
     } else {
-        console.log(`Using existing demo seller account (${sellerEmail})`)
+        console.log(`Attaching seeded products to existing seller: ${seller.email}`)
     }
 
-    // 2. Clear out any products previously created by this seed script
-    const deleted = await productModel.deleteMany({ seller: seller._id })
-    console.log(`Removed ${deleted.deletedCount} previously seeded product(s)`)
+    // 2. Clear out only products previously created BY THIS SCRIPT (matched
+    //    by title) — never touches the seller's own real listings.
+    const seedTitles = CATALOG.map(item => item.title)
+    const deleted = await productModel.deleteMany({ seller: seller._id, title: { $in: seedTitles } })
+    console.log(`Removed ${deleted.deletedCount} previously seeded demo product(s)`)
 
     // 3. Build and insert the catalog
     const productsToInsert = CATALOG.map(item => {

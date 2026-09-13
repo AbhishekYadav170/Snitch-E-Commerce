@@ -5,17 +5,17 @@ import { Link } from 'react-router';
 import { useNavigate } from 'react-router';
 
 const tokens = {
-    surface: '#fbf9f6',
-    surfaceLow: '#f5f3f0',
-    surfaceHigh: '#eae8e5',
-    surfaceHighest: '#e4e2df',
-    onSurface: '#1b1c1a',
-    onSurfaceVariant: '#4d463a',
-    secondary: '#7A6E63',
-    muted: '#B5ADA3',
+    surface: '#171512',
+    surfaceLow: '#201d18',
+    surfaceHigh: '#2b2720',
+    surfaceHighest: '#332e26',
+    onSurface: '#f3efe8',
+    onSurfaceVariant: '#cfc8ba',
+    secondary: '#a89e8d',
+    muted: '#6f665a',
     primary: '#C9A96E',
-    primaryDark: '#745a27',
-    outlineVariant: '#d0c5b5',
+    primaryDark: '#e9c98f',
+    outlineVariant: '#3a352c',
 };
 
 const TruckIcon = () => (
@@ -71,7 +71,7 @@ const Home = () => {
                 {/* ── Hero ── */}
                 <section
                     className="relative overflow-hidden"
-                    style={{ backgroundColor: tokens.onSurface }}
+                    style={{ backgroundColor: '#0f0d0a' }}
                 >
                     <div
                         className="absolute inset-0 opacity-40"

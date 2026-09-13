@@ -1,17 +1,36 @@
 
-import React, { useEffect } from 'react';
+
+import React, { useEffect, useState } from 'react';
 import { useProduct } from '../hooks/useProduct';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 
 const Dashboard = () => {
-    const { handleGetSellerProduct } = useProduct();
+    const { handleGetSellerProduct, handleDeleteProduct } = useProduct();
     const sellerProducts = useSelector(state => state.product.sellerProducts);
     const navigate = useNavigate();
+    const [ deletingId, setDeletingId ] = useState(null);
+    const [ dashboardError, setDashboardError ] = useState(null);
 
     useEffect(() => {
         handleGetSellerProduct();
     }, []);
+
+    const onDeleteProduct = async (e, product) => {
+        e.stopPropagation(); // don't navigate to the product detail page
+        const confirmed = window.confirm(`Delete "${product.title}" permanently? This cannot be undone.`);
+        if (!confirmed) return;
+
+        setDashboardError(null);
+        setDeletingId(product._id);
+        try {
+            await handleDeleteProduct(product._id);
+        } catch (err) {
+            setDashboardError(err?.response?.data?.message || 'Could not delete this product. Please try again.');
+        } finally {
+            setDeletingId(null);
+        }
+    };
 
     const totalProducts = sellerProducts?.length ?? 0;
     const totalVariants = sellerProducts?.reduce((sum, p) => sum + (p.variants?.length ?? 0), 0) ?? 0;
@@ -32,8 +51,8 @@ const Dashboard = () => {
             />
 
             <div
-                className="min-h-screen selection:bg-[#C9A96E]/30"
-                style={{ backgroundColor: '#fbf9f6', fontFamily: "'Inter', sans-serif" }}
+                className="min-h-screen selection:bg-[#FFD700]/30"
+                style={{ backgroundColor: '#131313', fontFamily: "'Inter', sans-serif" }}
             >
                 <div className="max-w-7xl mx-auto px-8 lg:px-16 xl:px-24">
 
@@ -42,16 +61,16 @@ const Dashboard = () => {
                         <button
                             onClick={() => navigate(-1)}
                             className="text-lg transition-colors duration-200 leading-none"
-                            style={{ color: '#B5ADA3' }}
+                            style={{ color: '#999077' }}
                             aria-label="Go back"
-                            onMouseEnter={e => e.currentTarget.style.color = '#C9A96E'}
-                            onMouseLeave={e => e.currentTarget.style.color = '#B5ADA3'}
+                            onMouseEnter={e => e.currentTarget.style.color = '#FFD700'}
+                            onMouseLeave={e => e.currentTarget.style.color = '#999077'}
                         >
                             ←
                         </button>
                         <span
                             className="text-xs font-medium tracking-[0.32em] uppercase"
-                            style={{ fontFamily: "'Cormorant Garamond', serif", color: '#C9A96E' }}
+                            style={{ fontFamily: "'Cormorant Garamond', serif", color: '#FFD700' }}
                         >
                             Snitch.
                         </span>
@@ -62,34 +81,41 @@ const Dashboard = () => {
                         <div>
                             <h1
                                 className="text-4xl lg:text-5xl font-light leading-tight"
-                                style={{ fontFamily: "'Cormorant Garamond', serif", color: '#1b1c1a' }}
+                                style={{ fontFamily: "'Cormorant Garamond', serif", color: '#e5e2e1' }}
                             >
                                 Your Vault
                             </h1>
                             {/* Gold rule separator */}
-                            <div className="mt-4 w-14 h-px" style={{ backgroundColor: '#C9A96E' }} />
+                            <div className="mt-4 w-14 h-px" style={{ backgroundColor: '#FFD700' }} />
                         </div>
 
                         <button
                             onClick={() => navigate('/seller/create-product')}
                             className="py-4 px-8 text-[11px] uppercase tracking-[0.3em] font-medium transition-all duration-300 w-full md:w-auto text-center"
                             style={{
-                                backgroundColor: '#1b1c1a',
-                                color: '#fbf9f6',
+                                backgroundColor: '#FFD700',
+                                color: '#131313',
                                 fontFamily: "'Inter', sans-serif"
                             }}
                             onMouseEnter={e => {
-                                e.currentTarget.style.backgroundColor = '#C9A96E';
-                                e.currentTarget.style.color = '#1b1c1a';
+                                e.currentTarget.style.backgroundColor = '#e9c400';
                             }}
                             onMouseLeave={e => {
-                                e.currentTarget.style.backgroundColor = '#1b1c1a';
-                                e.currentTarget.style.color = '#fbf9f6';
+                                e.currentTarget.style.backgroundColor = '#FFD700';
                             }}
                         >
                             New Listing
                         </button>
                     </div>
+
+                    {dashboardError && (
+                        <div
+                            className="mb-8 text-[11px] uppercase tracking-[0.15em] font-medium px-5 py-4 border"
+                            style={{ backgroundColor: '#2e1616', borderColor: '#5c2b2b', color: '#ff9a94' }}
+                        >
+                            {dashboardError}
+                        </div>
+                    )}
 
                     {/* ── Stats Row ── */}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pb-14">
@@ -102,15 +128,15 @@ const Dashboard = () => {
                             <div
                                 key={i}
                                 className="px-6 py-6 border flex flex-col gap-1"
-                                style={{ borderColor: '#e4e2df', backgroundColor: '#ffffff' }}
+                                style={{ borderColor: '#33302a', backgroundColor: '#1c1b1b' }}
                             >
                                 <span
                                     className="text-3xl font-light"
-                                    style={{ fontFamily: "'Cormorant Garamond', serif", color: '#1b1c1a' }}
+                                    style={{ fontFamily: "'Cormorant Garamond', serif", color: '#e5e2e1' }}
                                 >
                                     {stat.value}
                                 </span>
-                                <span className="text-[10px] uppercase tracking-[0.2em]" style={{ color: '#7A6E63' }}>
+                                <span className="text-[10px] uppercase tracking-[0.2em]" style={{ color: '#999077' }}>
                                     {stat.label}
                                 </span>
                             </div>
@@ -134,7 +160,7 @@ const Dashboard = () => {
                                         onClick={() => { navigate(`/seller/product/${product._id}`) }}
                                         key={product._id} className="group cursor-pointer flex flex-col">
                                         {/* Image Container */}
-                                        <div className="relative aspect-[4/5] overflow-hidden mb-6" style={{ backgroundColor: '#f5f3f0' }}>
+                                        <div className="relative aspect-[4/5] overflow-hidden mb-6" style={{ backgroundColor: '#201f1f' }}>
                                             <img
                                                 src={imageUrl}
                                                 alt={product.title}
@@ -148,14 +174,34 @@ const Dashboard = () => {
                                                     Out of Stock
                                                 </span>
                                             )}
+
+                                            <button
+                                                onClick={(e) => onDeleteProduct(e, product)}
+                                                disabled={deletingId === product._id}
+                                                aria-label={`Delete ${product.title}`}
+                                                title="Delete product"
+                                                className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 disabled:opacity-100 disabled:cursor-not-allowed"
+                                                style={{ backgroundColor: 'rgba(19,19,19,0.9)', color: '#ff9a94' }}
+                                            >
+                                                {deletingId === product._id ? (
+                                                    <span className="text-[9px] uppercase tracking-wide">...</span>
+                                                ) : (
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                                                        <polyline points="3 6 5 6 21 6" />
+                                                        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                                                        <line x1="10" y1="11" x2="10" y2="17" />
+                                                        <line x1="14" y1="11" x2="14" y2="17" />
+                                                    </svg>
+                                                )}
+                                            </button>
                                         </div>
 
                                         {/* Product Details */}
                                         <div className="flex flex-col gap-2">
                                             <div className="flex items-start justify-between gap-4">
                                                 <h3
-                                                    className="text-xl leading-snug transition-colors duration-300 group-hover:text-[#C9A96E]"
-                                                    style={{ fontFamily: "'Cormorant Garamond', serif", color: '#1b1c1a' }}
+                                                    className="text-xl leading-snug transition-colors duration-300 group-hover:text-[#FFD700]"
+                                                    style={{ fontFamily: "'Cormorant Garamond', serif", color: '#e5e2e1' }}
                                                 >
                                                     {product.title}
                                                 </h3>
@@ -163,7 +209,7 @@ const Dashboard = () => {
 
                                             <p
                                                 className="text-[12px] line-clamp-2 leading-relaxed"
-                                                style={{ color: '#7A6E63' }}
+                                                style={{ color: '#999077' }}
                                             >
                                                 {product.description}
                                             </p>
@@ -171,11 +217,11 @@ const Dashboard = () => {
                                             <div className="flex items-center justify-between mt-2">
                                                 <span
                                                     className="text-[10px] uppercase tracking-[0.2em] font-medium"
-                                                    style={{ color: '#1b1c1a' }}
+                                                    style={{ color: '#e5e2e1' }}
                                                 >
                                                     {product.price?.currency} {product.price?.amount?.toLocaleString()}
                                                 </span>
-                                                <span className="text-[10px] tracking-[0.1em]" style={{ color: '#B5ADA3' }}>
+                                                <span className="text-[10px] tracking-[0.1em]" style={{ color: '#6b6459' }}>
                                                     {variantCount} variant{variantCount !== 1 ? 's' : ''} · {stockTotal} in stock
                                                 </span>
                                             </div>
@@ -186,8 +232,8 @@ const Dashboard = () => {
                         </div>
                     ) : (
                         <div className="py-24 text-center flex flex-col items-center">
-                            <span className="text-[10px] uppercase tracking-[0.2em] font-medium mb-4" style={{ color: '#C9A96E' }}>Empty Vault</span>
-                            <p className="max-w-md mx-auto text-lg leading-relaxed" style={{ fontFamily: "'Cormorant Garamond', serif", color: '#7A6E63' }}>
+                            <span className="text-[10px] uppercase tracking-[0.2em] font-medium mb-4" style={{ color: '#FFD700' }}>Empty Vault</span>
+                            <p className="max-w-md mx-auto text-lg leading-relaxed" style={{ fontFamily: "'Cormorant Garamond', serif", color: '#999077' }}>
                                 You haven't added any curated pieces to your archive yet. Begin by creating a new listing.
                             </p>
                         </div>

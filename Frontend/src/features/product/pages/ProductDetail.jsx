@@ -1,5 +1,4 @@
 
-
 import React, { useEffect, useState, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router';
 import { useSelector } from 'react-redux';
@@ -179,8 +178,8 @@ const activeVariant = useMemo(() => {
 
     if (!product) {
         return (
-            <div className="min-h-screen flex items-center justify-center selection:bg-[#C9A96E]/30" style={{ backgroundColor: '#fbf9f6' }}>
-                <p style={{ fontFamily: "'Inter', sans-serif", color: '#B5ADA3' }} className="text-[10px] uppercase tracking-[0.2em] font-medium animate-pulse">
+            <div className="min-h-screen flex items-center justify-center selection:bg-[#C9A96E]/30" style={{ backgroundColor: '#171512' }}>
+                <p style={{ fontFamily: "'Inter', sans-serif", color: '#8a8071' }} className="text-[10px] uppercase tracking-[0.2em] font-medium animate-pulse">
                     Retrieving piece...
                 </p>
             </div>
@@ -209,7 +208,7 @@ const activeVariant = useMemo(() => {
 
             <div
                 className="min-h-screen selection:bg-[#C9A96E]/30 pb-24"
-                style={{ backgroundColor: '#fbf9f6', fontFamily: "'Inter', sans-serif" }}
+                style={{ backgroundColor: '#171512', fontFamily: "'Inter', sans-serif" }}
             >
                 {/* ── Navbar ──
                 <nav className="px-8 lg:px-16 xl:px-24 pt-10 pb-6 flex items-center justify-between border-b" style={{ borderColor: '#e4e2df' }}>
@@ -242,7 +241,7 @@ const activeVariant = useMemo(() => {
                                             key={idx}
                                             onClick={() => setSelectedImage(idx)}
                                             className={`flex-shrink-0 w-20 md:w-full aspect-[4/5] overflow-hidden transition-all duration-300 ${selectedImage === idx ? 'opacity-100 ring-1 ring-[#C9A96E] ring-offset-2' : 'opacity-50 hover:opacity-100'}`}
-                                            style={{ backgroundColor: '#f5f3f0', '--tw-ring-offset-color': '#fbf9f6' }}
+                                            style={{ backgroundColor: '#201d18', '--tw-ring-offset-color': '#171512' }}
                                         >
                                             <img
 
@@ -253,7 +252,7 @@ const activeVariant = useMemo(() => {
                             )}
 
                             {/* Main Image */}
-                            <div className="relative w-full aspect-4/5 overflow-hidden group" style={{ backgroundColor: '#f5f3f0' }}>
+                            <div className="relative w-full aspect-4/5 overflow-hidden group" style={{ backgroundColor: '#201d18' }}>
                                 <img
                                     src={displayImages[ selectedImage ]?.url || displayImages[ 0 ].url}
                                     alt={product.title}
@@ -265,9 +264,9 @@ const activeVariant = useMemo(() => {
                                         <button
                                             onClick={() => setSelectedImage(prev => prev === 0 ? displayImages.length - 1 : prev - 1)}
                                             className="absolute left-4 lg:left-6 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 border"
-                                            style={{ backgroundColor: 'rgba(251,249,246,0.8)', borderColor: '#e4e2df', color: '#1b1c1a' }}
-                                            onMouseEnter={e => e.currentTarget.style.backgroundColor = '#fbf9f6'}
-                                            onMouseLeave={e => e.currentTarget.style.backgroundColor = 'rgba(251,249,246,0.8)'}
+                                            style={{ backgroundColor: 'rgba(23,21,18,0.8)', borderColor: '#3a352c', color: '#f3efe8' }}
+                                            onMouseEnter={e => e.currentTarget.style.backgroundColor = '#26221c'}
+                                            onMouseLeave={e => e.currentTarget.style.backgroundColor = 'rgba(23,21,18,0.8)'}
                                             aria-label="Previous image"
                                         >
                                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.2" d="M15 19l-7-7 7-7" /></svg>
@@ -275,9 +274,9 @@ const activeVariant = useMemo(() => {
                                         <button
                                             onClick={() => setSelectedImage(prev => prev === displayImages.length - 1 ? 0 : prev + 1)}
                                             className="absolute right-4 lg:right-6 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 border"
-                                            style={{ backgroundColor: 'rgba(251,249,246,0.8)', borderColor: '#e4e2df', color: '#1b1c1a' }}
-                                            onMouseEnter={e => e.currentTarget.style.backgroundColor = '#fbf9f6'}
-                                            onMouseLeave={e => e.currentTarget.style.backgroundColor = 'rgba(251,249,246,0.8)'}
+                                            style={{ backgroundColor: 'rgba(23,21,18,0.8)', borderColor: '#3a352c', color: '#f3efe8' }}
+                                            onMouseEnter={e => e.currentTarget.style.backgroundColor = '#26221c'}
+                                            onMouseLeave={e => e.currentTarget.style.backgroundColor = 'rgba(23,21,18,0.8)'}
                                             aria-label="Next image"
                                         >
                                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.2" d="M9 5l7 7-7 7" /></svg>
@@ -292,7 +291,7 @@ const activeVariant = useMemo(() => {
 
                             <h1
                                 className="text-4xl md:text-5xl lg:text-6xl font-light leading-[1.05] mb-6"
-                                style={{ fontFamily: "'Cormorant Garamond', serif", color: '#1b1c1a' }}
+                                style={{ fontFamily: "'Cormorant Garamond', serif", color: '#f3efe8' }}
                             >
                                 {product.title}
                             </h1>
@@ -300,13 +299,13 @@ const activeVariant = useMemo(() => {
                             <div className="mb-8">
                                 <span
                                     className="text-sm uppercase tracking-[0.2em] font-medium"
-                                    style={{ color: '#1b1c1a' }}
+                                    style={{ color: '#f3efe8' }}
                                 >
                                     {displayPrice?.currency} {displayPrice?.amount?.toLocaleString()}
                                 </span>
                             </div>
 
-                            <div className="h-px w-full mb-8" style={{ backgroundColor: '#e4e2df' }} />
+                            <div className="h-px w-full mb-8" style={{ backgroundColor: '#332e26' }} />
 
                             {/* Options/Variants */}
                             {Object.entries(availableAttributes).map(([attrName, values]) => {
@@ -329,7 +328,7 @@ const activeVariant = useMemo(() => {
                                                             aria-label={val}
                                                             className="w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200"
                                                             style={{
-                                                                border: isSelected ? '2px solid #1b1c1a' : '1px solid #d0c5b5',
+                                                                border: isSelected ? '2px solid #f3efe8' : '1px solid #3a352c',
                                                                 padding: '2px',
                                                             }}
                                                         >
@@ -337,7 +336,7 @@ const activeVariant = useMemo(() => {
                                                                 className="w-full h-full rounded-full block"
                                                                 style={{
                                                                     backgroundColor: val.toLowerCase().replace(/\s+/g, ''),
-                                                                    boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.12)',
+                                                                    boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.25)',
                                                                 }}
                                                             />
                                                         </button>
@@ -352,7 +351,7 @@ const activeVariant = useMemo(() => {
                                                         <button
                                                             key={val}
                                                             onClick={() => handleAttributeChange(attrName, val)}
-                                                            className={`min-w-[44px] px-3 py-2 text-[11px] uppercase tracking-[0.1em] font-medium transition-all duration-300 border ${isSelected ? 'border-[#1b1c1a] bg-[#1b1c1a] text-[#fbf9f6]' : 'border-[#d0c5b5] text-[#1b1c1a] hover:border-[#1b1c1a]'}`}
+                                                            className={`min-w-[44px] px-3 py-2 text-[11px] uppercase tracking-[0.1em] font-medium transition-all duration-300 border ${isSelected ? 'border-[#f3efe8] bg-[#f3efe8] text-[#171512]' : 'border-[#3a352c] text-[#f3efe8] hover:border-[#f3efe8]'}`}
                                                             style={isSelected ? {} : { backgroundColor: 'transparent' }}
                                                         >
                                                             {val}
@@ -368,7 +367,7 @@ const activeVariant = useMemo(() => {
                             {/* Stock Information */}
                             {activeVariant && activeVariant.stock !== undefined && (
                                 <div className="mb-6">
-                                    <span className={`text-[10px] uppercase tracking-[0.2em] font-medium ${activeVariant.stock > 0 ? 'text-green-700' : 'text-red-700'}`}>
+                                    <span className={`text-[10px] uppercase tracking-[0.2em] font-medium ${activeVariant.stock > 0 ? 'text-green-500' : 'text-red-500'}`}>
                                         {activeVariant.stock > 0 ? `${activeVariant.stock} in stock` : 'Out of stock'}
                                     </span>
                                 </div>
@@ -378,7 +377,7 @@ const activeVariant = useMemo(() => {
                                 <h3 className="text-[10px] uppercase tracking-[0.24em] font-medium mb-4" style={{ color: '#C9A96E' }}>
                                     The Details
                                 </h3>
-                                <p className="text-sm leading-relaxed" style={{ color: '#7A6E63' }}>
+                                <p className="text-sm leading-relaxed" style={{ color: '#a89e8d' }}>
                                     {product.description}
                                 </p>
                             </div>
@@ -390,8 +389,8 @@ const activeVariant = useMemo(() => {
                                         className="text-[11px] uppercase tracking-[0.15em] font-medium px-4 py-3 border"
                                         style={
                                             cartMessage.type === 'success'
-                                                ? { backgroundColor: '#eef4ea', borderColor: '#a9c79a', color: '#3d5a34' }
-                                                : { backgroundColor: '#fbeaea', borderColor: '#e0a8a8', color: '#8a2d2d' }
+                                                ? { backgroundColor: '#16241a', borderColor: '#3d6b3d', color: '#9fd9a0' }
+                                                : { backgroundColor: '#2e1616', borderColor: '#5c2b2b', color: '#ff9a94' }
                                         }
                                     >
                                         {cartMessage.text}
@@ -402,19 +401,19 @@ const activeVariant = useMemo(() => {
                                     disabled={isAddingToCart || (activeVariant?.stock !== undefined && activeVariant.stock <= 0)}
                                     className="w-full py-4 text-[11px] uppercase tracking-[0.25em] font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                                     style={{
-                                        backgroundColor: '#1b1c1a',
-                                        color: '#fbf9f6',
+                                        backgroundColor: '#f3efe8',
+                                        color: '#171512',
                                         fontFamily: "'Inter', sans-serif"
                                     }}
                                     onMouseEnter={e => {
                                         if (e.currentTarget.disabled) return;
                                         e.currentTarget.style.backgroundColor = '#C9A96E';
-                                        e.currentTarget.style.color = '#1b1c1a';
+                                        e.currentTarget.style.color = '#171512';
                                     }}
                                     onMouseLeave={e => {
                                         if (e.currentTarget.disabled) return;
-                                        e.currentTarget.style.backgroundColor = '#1b1c1a';
-                                        e.currentTarget.style.color = '#fbf9f6';
+                                        e.currentTarget.style.backgroundColor = '#f3efe8';
+                                        e.currentTarget.style.color = '#171512';
                                     }}
                                     onClick={addToCart}
                                 >
@@ -430,8 +429,8 @@ const activeVariant = useMemo(() => {
                                     className="w-full py-4 text-[11px] uppercase tracking-[0.25em] font-medium transition-all duration-300 border disabled:opacity-50 disabled:cursor-not-allowed"
                                     style={{
                                         backgroundColor: 'transparent',
-                                        borderColor: '#d0c5b5',
-                                        color: '#1b1c1a',
+                                        borderColor: '#3a352c',
+                                        color: '#f3efe8',
                                         fontFamily: "'Inter', sans-serif"
                                     }}
                                     onMouseEnter={e => {
@@ -440,7 +439,7 @@ const activeVariant = useMemo(() => {
                                     }}
                                     onMouseLeave={e => {
                                         if (e.currentTarget.disabled) return;
-                                        e.currentTarget.style.borderColor = '#d0c5b5';
+                                        e.currentTarget.style.borderColor = '#3a352c';
                                     }}
                                     onClick={handleBuyNow}
                                 >
@@ -449,16 +448,16 @@ const activeVariant = useMemo(() => {
                             </div>
 
                             {/* Extra elegant details */}
-                            <div className="mt-14 space-y-4 text-[10px] uppercase tracking-[0.1em]" style={{ color: '#B5ADA3' }}>
-                                <div className="flex justify-between border-b pb-3" style={{ borderColor: '#e4e2df' }}>
+                            <div className="mt-14 space-y-4 text-[10px] uppercase tracking-[0.1em]" style={{ color: '#8a8071' }}>
+                                <div className="flex justify-between border-b pb-3" style={{ borderColor: '#332e26' }}>
                                     <span>Shipping</span>
                                     <span>Complimentary over INR 15,000</span>
                                 </div>
-                                <div className="flex justify-between border-b pb-3" style={{ borderColor: '#e4e2df' }}>
+                                <div className="flex justify-between border-b pb-3" style={{ borderColor: '#332e26' }}>
                                     <span>Returns</span>
                                     <span>Within 14 days of delivery</span>
                                 </div>
-                                <div className="flex justify-between border-b pb-3" style={{ borderColor: '#e4e2df' }}>
+                                <div className="flex justify-between border-b pb-3" style={{ borderColor: '#332e26' }}>
                                     <span>Authenticity</span>
                                     <span>100% Guaranteed</span>
                                 </div>

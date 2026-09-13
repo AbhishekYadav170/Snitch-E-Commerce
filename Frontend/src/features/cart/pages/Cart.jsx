@@ -6,19 +6,19 @@ import { Link, useNavigate } from 'react-router'
 
 /* ─── Inline styles & tokens matching the "Avenue Montaigne" design system ─── */
 const tokens = {
-    surface: '#fbf9f6',
-    surfaceLow: '#f5f3f0',
-    surfaceLowest: '#ffffff',
-    surfaceHigh: '#eae8e5',
-    surfaceHighest: '#e4e2df',
-    onSurface: '#1b1c1a',
-    onSurfaceVariant: '#4d463a',
-    secondary: '#7A6E63',
-    muted: '#B5ADA3',
+    surface: '#171512',
+    surfaceLow: '#201d18',
+    surfaceLowest: '#26221c',
+    surfaceHigh: '#2b2720',
+    surfaceHighest: '#332e26',
+    onSurface: '#f3efe8',
+    onSurfaceVariant: '#cfc8ba',
+    secondary: '#a89e8d',
+    muted: '#6f665a',
     primary: '#C9A96E',
-    primaryDark: '#745a27',
-    outlineVariant: '#d0c5b5',
-    outline: '#7f7668',
+    primaryDark: '#e9c98f',
+    outlineVariant: '#3a352c',
+    outline: '#8a8071',
 }
 
 const Cart = () => {
@@ -197,7 +197,7 @@ const Cart = () => {
                             {cartError && (
                                 <div
                                     className="mb-8 text-[11px] uppercase tracking-[0.15em] font-medium px-5 py-4 border"
-                                    style={{ backgroundColor: '#fbeaea', borderColor: '#e0a8a8', color: '#8a2d2d' }}
+                                    style={{ backgroundColor: '#2e1616', borderColor: '#5c2b2b', color: '#ff9a94' }}
                                 >
                                     {cartError}
                                 </div>
