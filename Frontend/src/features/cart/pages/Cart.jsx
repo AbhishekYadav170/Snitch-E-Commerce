@@ -1,30 +1,18 @@
 
+
+
+
 // import React, { useEffect, useState } from 'react'
 // import { useSelector } from 'react-redux'
 // import { useCart } from '../hook/useCart'
 // import { Link, useNavigate } from 'react-router'
-
-// /* ─── Inline styles & tokens matching the "Avenue Montaigne" design system ─── */
-// const tokens = {
-//     surface: '#171512',
-//     surfaceLow: '#201d18',
-//     surfaceLowest: '#26221c',
-//     surfaceHigh: '#2b2720',
-//     surfaceHighest: '#332e26',
-//     onSurface: '#f3efe8',
-//     onSurfaceVariant: '#cfc8ba',
-//     secondary: '#a89e8d',
-//     muted: '#6f665a',
-//     primary: '#C9A96E',
-//     primaryDark: '#e9c98f',
-//     outlineVariant: '#3a352c',
-//     outline: '#8a8071',
-// }
+// import { useTokens } from '../../../app/ThemeContext'
 
 // const Cart = () => {
 //     const cartItems = useSelector(state => state.cart.items)
 //     const { handleGetCart, handleIncrementCartItem, handleDecrementCartItem, handleRemoveCartItem } = useCart()
 //     const navigate = useNavigate()
+//     const tokens = useTokens()
 
 //     /* Tracks which cart line is mid-request, keyed by `${productId}-${variantId}` */
 //     const [ pendingKeys, setPendingKeys ] = useState({})
@@ -308,9 +296,9 @@
 //                                                     >
 //                                                         <button
 //                                                             id={`qty-dec-${_id}`}
-//                                                             disabled={isPending}
+//                                                             disabled={isPending || qty <= 1}
 //                                                             onClick={() => withPending(itemKey, () => handleDecrementCartItem({ productId: _id, variantId }))}
-//                                                             className="w-9 h-9 flex items-center justify-center text-sm font-light transition-colors hover:opacity-60 disabled:cursor-not-allowed"
+//                                                             className="w-9 h-9 flex items-center justify-center text-sm font-light transition-colors hover:opacity-60 disabled:cursor-not-allowed disabled:opacity-40"
 //                                                             style={{ color: tokens.onSurface, borderRight: `1px solid ${tokens.outlineVariant}` }}
 //                                                             aria-label="Decrease quantity"
 //                                                         >
@@ -519,7 +507,6 @@
 // }
 
 // export default Cart
-
 
 
 
@@ -988,6 +975,7 @@ const Cart = () => {
                                         e.currentTarget.style.backgroundColor = tokens.onSurface
                                         e.currentTarget.style.color = tokens.surface
                                     }}
+                                    onClick={() => navigate('/checkout')}
                                 >
                                     Proceed to Checkout
                                 </button>
@@ -1030,6 +1018,7 @@ const Cart = () => {
 }
 
 export default Cart
+
 
 
 
