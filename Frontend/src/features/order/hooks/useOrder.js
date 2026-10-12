@@ -44,58 +44,116 @@
 //     }
 // }
 
-import { useDispatch } from "react-redux";
-import {
-  placeOrder,
-  getMyOrders,
-  getSellerOrders,
-  getOrderById,
-  updateOrderStatus,
-} from "../service/order.api";
-import {
-  setMyOrders,
-  setSellerOrders,
-  setLastPlacedOrder,
-  updateSellerOrderStatus,
-} from "../state/order.slice";
+
+
+// import { useDispatch } from "react-redux";
+// import {
+//   placeOrder,
+//   getMyOrders,
+//   getSellerOrders,
+//   getOrderById,
+//   updateOrderStatus,
+// } from "../service/order.api";
+// import {
+//   setMyOrders,
+//   setSellerOrders,
+//   setLastPlacedOrder,
+//   updateSellerOrderStatus,
+// } from "../state/order.slice";
+
+// export const useOrder = () => {
+//   const dispatch = useDispatch();
+
+//   async function handlePlaceOrder(shippingAddress, selectedItems) {
+//     const data = await placeOrder(shippingAddress, selectedItems);
+//     dispatch(setLastPlacedOrder(data.order));
+//     return data.order;
+//   }
+
+//   async function handleGetMyOrders() {
+//     const data = await getMyOrders();
+//     dispatch(setMyOrders(data.orders));
+//     return data.orders;
+//   }
+
+//   async function handleGetSellerOrders() {
+//     const data = await getSellerOrders();
+//     dispatch(setSellerOrders(data.orders));
+//     return data.orders;
+//   }
+
+//   async function handleGetOrderById(orderId) {
+//     const data = await getOrderById(orderId);
+//     return data.order;
+//   }
+
+//   async function handleUpdateOrderStatus(orderId, status) {
+//     const data = await updateOrderStatus(orderId, status);
+//     dispatch(updateSellerOrderStatus({ orderId, status }));
+//     return data.order;
+//   }
+
+//   return {
+//     handlePlaceOrder,
+//     handleGetMyOrders,
+//     handleGetSellerOrders,
+//     handleGetOrderById,
+//     handleUpdateOrderStatus,
+//   };
+// };
+
+
+
+
+import { useDispatch } from "react-redux"
+import { placeOrder, getMyOrders, getSellerOrders, getOrderById, updateOrderStatus, cancelOrder } from "../service/order.api"
+import { setMyOrders, setSellerOrders, setLastPlacedOrder, updateSellerOrderStatus, updateMyOrderStatus } from "../state/order.slice"
 
 export const useOrder = () => {
-  const dispatch = useDispatch();
 
-  async function handlePlaceOrder(shippingAddress, selectedItems) {
-    const data = await placeOrder(shippingAddress, selectedItems);
-    dispatch(setLastPlacedOrder(data.order));
-    return data.order;
-  }
+    const dispatch = useDispatch()
 
-  async function handleGetMyOrders() {
-    const data = await getMyOrders();
-    dispatch(setMyOrders(data.orders));
-    return data.orders;
-  }
+    async function handlePlaceOrder(shippingAddress, selectedItems) {
+        const data = await placeOrder(shippingAddress, selectedItems)
+        dispatch(setLastPlacedOrder(data.order))
+        return data.order
+    }
 
-  async function handleGetSellerOrders() {
-    const data = await getSellerOrders();
-    dispatch(setSellerOrders(data.orders));
-    return data.orders;
-  }
+    async function handleGetMyOrders() {
+        const data = await getMyOrders()
+        dispatch(setMyOrders(data.orders))
+        return data.orders
+    }
 
-  async function handleGetOrderById(orderId) {
-    const data = await getOrderById(orderId);
-    return data.order;
-  }
+    async function handleGetSellerOrders() {
+        const data = await getSellerOrders()
+        dispatch(setSellerOrders(data.orders))
+        return data.orders
+    }
 
-  async function handleUpdateOrderStatus(orderId, status) {
-    const data = await updateOrderStatus(orderId, status);
-    dispatch(updateSellerOrderStatus({ orderId, status }));
-    return data.order;
-  }
+    async function handleGetOrderById(orderId) {
+        const data = await getOrderById(orderId)
+        return data.order
+    }
 
-  return {
-    handlePlaceOrder,
-    handleGetMyOrders,
-    handleGetSellerOrders,
-    handleGetOrderById,
-    handleUpdateOrderStatus,
-  };
-};
+    async function handleUpdateOrderStatus(orderId, status) {
+        const data = await updateOrderStatus(orderId, status)
+        dispatch(updateSellerOrderStatus({ orderId, status }))
+        return data.order
+    }
+
+    async function handleCancelOrder(orderId) {
+        const data = await cancelOrder(orderId)
+        dispatch(updateMyOrderStatus({ orderId, status: "cancelled" }))
+        return data.order
+    }
+
+    return {
+        handleCancelOrder,
+        handlePlaceOrder,
+        handleGetMyOrders,
+        handleGetSellerOrders,
+        handleGetOrderById,
+        handleUpdateOrderStatus
+    }
+}

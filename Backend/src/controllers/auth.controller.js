@@ -1,8 +1,164 @@
 
+// import userModel from "../models/user.model.js";
+// import jwt from "jsonwebtoken"
+// import { config } from "../config/config.js";
+// import productModel from "../models/product.model.js";
+
+
+// async function sendTokenResponse(user, res, message) {
+
+//     const token = jwt.sign({
+//         id: user._id,
+//     }, config.JWT_SECRET, {
+//         expiresIn: "7d"
+//     })
+
+//     res.cookie("token", token)
+
+//     res.status(200).json({
+//         message,
+//         success: true,
+//         user: {
+//             id: user._id,
+//             email: user.email,
+//             contact: user.contact,
+//             fullname: user.fullname,
+//             role: user.role
+//         }
+//     })
+
+// }
+
+
+// export const register = async (req, res) => {
+//     const { email, contact, password, fullname, isSeller } = req.body;
+
+//     try {
+//         const existingUser = await userModel.findOne({
+//             $or: [
+//                 { email },
+//                 { contact }
+//             ]
+//         })
+
+//         if (existingUser) {
+//             return res.status(400).json({ message: "User with this email or contact already exists" });
+//         }
+
+//         const user = await userModel.create({
+//             email,
+//             contact,
+//             password,
+//             fullname,
+//             role: isSeller ? "seller" : "buyer"
+//         })
+
+//         await sendTokenResponse(user, res, "User registered successfully")
+
+//     } catch (error) {
+//         console.log(error)
+//         return res.status(500).json({ message: "Server error" });
+//     }
+// }
+
+// export const login = async (req, res) => {
+//     const { email, password } = req.body;
+
+//     try {
+//         const user = await userModel.findOne({ email });
+
+//         if (!user) {
+//             return res.status(400).json({ message: "Invalid email or password" });
+//         }
+
+//         const isMatch = await user.comparePassword(password);
+
+//         if (!isMatch) {
+//             return res.status(400).json({ message: "Invalid email or password" });
+//         }
+
+//         await sendTokenResponse(user, res, "User logged in successfully")
+//     } catch (error) {
+//         console.log(error)
+//         return res.status(500).json({ message: "Server error" });
+//     }
+// }
+
+// export const logout = async (req, res) => {
+//     res.clearCookie("token")
+
+//     res.status(200).json({
+//         message: "Logged out successfully",
+//         success: true
+//     })
+// }
+
+// export const googleCallback = async (req, res) => {
+//     const { id, displayName, emails, photos } = req.user
+//     const email = emails[ 0 ].value;
+//     const profilePic = photos[ 0 ].value;
+
+
+//     let user = await userModel.findOne({
+//         email
+//     })
+
+//     if (!user) {
+//         user = await userModel.create({
+//             email,
+//             googleId: id,
+//             fullname: displayName,
+//         })
+//     }
+
+
+//     const token = jwt.sign({
+//         id: user._id,
+//     }, config.JWT_SECRET, {
+//         expiresIn: "7d"
+//     })
+
+//     res.cookie("token", token)
+
+//     res.redirect("http://localhost:5173/")
+// }
+
+// export const getMe = async (req,res) => {
+//     const user = req.user;
+
+//     res.status(200).json({
+//         message: "User fetched successfully",
+//         success: true,
+//         user: {
+//             id: user._id,
+//             email: user.email,
+//             contact: user.contact,
+//             fullname: user.fullname,
+//             role: user.role
+//         }
+//     })
+// }
+
+// export async function getAllProduct(req, res) {
+//     const product = await productModel.find()
+
+//     return res.status(200).json({
+//         message: "Product fetched successfully",
+//         success: true,
+//         product
+//     })
+// }
+
+
+
+
+
 import userModel from "../models/user.model.js";
 import jwt from "jsonwebtoken"
 import { config } from "../config/config.js";
 import productModel from "../models/product.model.js";
+import crypto from "crypto";
+import { sendResetPasswordEmail } from "../utils/email.js";
 
 
 async function sendTokenResponse(user, res, message) {
@@ -147,4 +303,70 @@ export async function getAllProduct(req, res) {
         success: true,
         product
     })
+}
+
+export const forgotPassword = async (req, res) => {
+    const genericResponse = {
+        message: "If an account exists for this email, a reset link has been sent.",
+        success: true
+    }
+
+    try {
+        const { email } = req.body
+        const user = await userModel.findOne({ email })
+
+        if (user) {
+            const rawToken = crypto.randomBytes(32).toString("hex")
+            user.resetPasswordToken = crypto.createHash("sha256").update(rawToken).digest("hex")
+            user.resetPasswordExpires = new Date(Date.now() + 30 * 60 * 1000)
+            await user.save()
+
+            const resetUrl = `${config.FRONTEND_URL}/reset-password/${rawToken}`
+            try {
+                await sendResetPasswordEmail(user.email, resetUrl)
+            } catch (mailError) {
+                console.error("Could not send reset email:", mailError)
+            }
+        }
+
+        // Same response whether or not the email exists (prevents account enumeration)
+        return res.status(200).json(genericResponse)
+    } catch (error) {
+        console.error("forgotPassword failed:", error)
+        return res.status(500).json({ message: "Server error", success: false })
+    }
+}
+
+export const resetPassword = async (req, res) => {
+    try {
+        const { token } = req.params
+        const { password } = req.body
+
+        const hashed = crypto.createHash("sha256").update(token).digest("hex")
+
+        const user = await userModel.findOne({
+            resetPasswordToken: hashed,
+            resetPasswordExpires: { $gt: new Date() }
+        })
+
+        if (!user) {
+            return res.status(400).json({
+                message: "This reset link is invalid or has expired.",
+                success: false
+            })
+        }
+
+        user.password = password // hashed by the pre-save hook
+        user.resetPasswordToken = undefined
+        user.resetPasswordExpires = undefined
+        await user.save()
+
+        return res.status(200).json({
+            message: "Password updated successfully. You can log in now.",
+            success: true
+        })
+    } catch (error) {
+        console.error("resetPassword failed:", error)
+        return res.status(500).json({ message: "Server error", success: false })
+    }
 }
