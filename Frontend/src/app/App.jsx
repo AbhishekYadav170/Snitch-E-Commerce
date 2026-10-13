@@ -31,6 +31,42 @@
 
 
 
+// import { useState } from 'react'
+// import './App.css'
+// import { RouterProvider } from 'react-router'
+// import { routes } from './app.routes'
+// import { useSelector } from 'react-redux'
+// import { useAuth } from '../features/auth/hook/useAuth'
+// import { useEffect } from 'react'
+// import { ThemeProvider } from './ThemeContext'
+
+// function App() {
+
+//   const { handleGetMe } = useAuth()
+
+//   const user = useSelector(state => state.auth.user)
+
+//   console.log(user)
+
+
+//   useEffect(() => {
+//     handleGetMe()
+//   }, [])
+
+  
+//   return (
+//    <ThemeProvider>
+//      <RouterProvider router={routes} />
+//    </ThemeProvider>
+//   )
+// }
+
+// export default App
+
+
+
+
+
 import { useState } from 'react'
 import './App.css'
 import { RouterProvider } from 'react-router'
@@ -39,6 +75,7 @@ import { useSelector } from 'react-redux'
 import { useAuth } from '../features/auth/hook/useAuth'
 import { useEffect } from 'react'
 import { ThemeProvider } from './ThemeContext'
+import { useWishlist } from '../features/wishlist/hook/useWishlist'
 
 function App() {
 
@@ -53,6 +90,17 @@ function App() {
     handleGetMe()
   }, [])
 
+  const { handleLoadWishlist, handleClearWishlist } = useWishlist()
+
+  // Keep the wishlist hearts in sync with the logged-in customer
+  useEffect(() => {
+    if (user && user.role !== 'seller') {
+      handleLoadWishlist().catch(() => {})
+    } else {
+      handleClearWishlist()
+    }
+  }, [ user?.id ])
+
   
   return (
    <ThemeProvider>
@@ -62,4 +110,3 @@ function App() {
 }
 
 export default App
-

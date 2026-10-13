@@ -1,9 +1,10 @@
 
-// import React, { useEffect } from 'react';
+
+
+// import React, { useEffect, useMemo, useState } from 'react';
 // import { useSelector } from 'react-redux';
 // import { useProduct } from '../hooks/useProduct';
-// import { Link } from 'react-router';
-// import { useNavigate } from 'react-router';
+// import { Link, useNavigate, useSearchParams } from 'react-router';
 // import { useTokens, useTheme } from '../../../app/ThemeContext';
 
 // const TruckIcon = () => (
@@ -34,6 +35,14 @@
 //     { icon: <SupportIcon />, title: 'Dedicated Support', text: 'We are here whenever you need us' },
 // ];
 
+// const CATEGORIES = [ 'All', 'Clothing', 'Electronics', 'Beauty', 'Books', 'Furniture', 'Food' ];
+
+// const CATEGORY_ICONS = {
+//     All: '✦', Clothing: '👕', Electronics: '🎧', Beauty: '💄', Books: '📚', Furniture: '🪑', Food: '🥗',
+// };
+
+// const HERO_INTERVAL = 4500;
+
 // const Home = () => {
 //     const products = useSelector(state => state.product.products);
 //     const user = useSelector(state => state.auth.user);
@@ -43,9 +52,60 @@
 
 //     const navigate = useNavigate();
 
+//     // Category + search live in the URL (?category=Books&q=shirt) so back/refresh keep them
+//     const [ searchParams, setSearchParams ] = useSearchParams();
+//     const activeCategory = CATEGORIES.includes(searchParams.get('category')) ? searchParams.get('category') : 'All';
+//     const query = searchParams.get('q') || '';
+
+//     const updateParams = (next) => {
+//         const params = new URLSearchParams(searchParams);
+//         Object.entries(next).forEach(([ k, v ]) => {
+//             if (!v || v === 'All') params.delete(k); else params.set(k, v);
+//         });
+//         setSearchParams(params, { replace: true });
+//     };
+
 //     useEffect(() => {
 //         handleGetAllProducts();
 //     }, []);
+
+//     const categoryOf = (p) => p.category || 'Clothing';
+
+//     const filteredProducts = useMemo(() => {
+//         const q = query.trim().toLowerCase();
+//         return (products || []).filter(p => {
+//             if (activeCategory !== 'All' && categoryOf(p) !== activeCategory) return false;
+//             if (!q) return true;
+//             return (
+//                 p.title?.toLowerCase().includes(q) ||
+//                 p.description?.toLowerCase().includes(q) ||
+//                 categoryOf(p).toLowerCase().includes(q)
+//             );
+//         });
+//     }, [ products, activeCategory, query ]);
+
+//     // ── Hero carousel: always shows the newest products ──
+//     const latestProducts = useMemo(() => {
+//         return [ ...(products || []) ]
+//             .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0))
+//             .slice(0, 5);
+//     }, [ products ]);
+
+//     const [ slide, setSlide ] = useState(0);
+//     const [ paused, setPaused ] = useState(false);
+//     const slideCount = latestProducts.length;
+
+//     useEffect(() => {
+//         if (slideCount < 2 || paused) return;
+//         const id = setInterval(() => setSlide(i => (i + 1) % slideCount), HERO_INTERVAL);
+//         return () => clearInterval(id);
+//     }, [ slideCount, paused ]);
+
+//     useEffect(() => {
+//         if (slide >= slideCount) setSlide(0);
+//     }, [ slideCount ]);
+
+//     const goTo = (i) => setSlide((i + slideCount) % slideCount);
 
 //     return (
 //         <>
@@ -58,7 +118,159 @@
 //                 className="min-h-screen selection:bg-[#C9A96E]/30"
 //                 style={{ backgroundColor: tokens.surface, fontFamily: "'Inter', sans-serif" }}
 //             >
-//                 {/* ── Hero ── */}
+//                 {/* ── Search + Category bar ── */}
+//                 <div className="border-b" style={{ backgroundColor: tokens.surface, borderColor: tokens.surfaceHighest }}>
+//                     <div className="max-w-7xl mx-auto px-6 lg:px-16 xl:px-24 pt-4 pb-3">
+//                         <form
+//                             onSubmit={(e) => { e.preventDefault(); document.getElementById('collection')?.scrollIntoView({ behavior: 'smooth' }); }}
+//                             className="relative mb-3"
+//                             role="search"
+//                         >
+//                             <svg className="absolute left-4 top-1/2 -translate-y-1/2" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={tokens.muted} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="7" /><line x1="21" y1="21" x2="16.5" y2="16.5" /></svg>
+//                             <input
+//                                 id="product-search"
+//                                 type="search"
+//                                 value={query}
+//                                 onChange={(e) => updateParams({ q: e.target.value })}
+//                                 placeholder="Search for products, brands and more"
+//                                 className="w-full pl-11 pr-10 py-3 text-sm outline-none border transition-colors"
+//                                 style={{ backgroundColor: tokens.surfaceLow, borderColor: tokens.outlineVariant, color: tokens.onSurface }}
+//                             />
+//                             {query && (
+//                                 <button
+//                                     type="button"
+//                                     onClick={() => updateParams({ q: '' })}
+//                                     aria-label="Clear search"
+//                                     className="absolute right-3 top-1/2 -translate-y-1/2 text-lg leading-none"
+//                                     style={{ color: tokens.muted }}
+//                                 >
+//                                     ×
+//                                 </button>
+//                             )}
+//                         </form>
+
+//                         <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
+//                             {CATEGORIES.map(c => {
+//                                 const active = c === activeCategory;
+//                                 return (
+//                                     <button
+//                                         key={c}
+//                                         id={`category-${c}`}
+//                                         type="button"
+//                                         onClick={() => updateParams({ category: c })}
+//                                         className="flex items-center gap-2 px-5 py-2 text-[11px] uppercase tracking-[0.15em] font-medium whitespace-nowrap border transition-all duration-200 cursor-pointer"
+//                                         style={{
+//                                             backgroundColor: active ? tokens.onSurface : 'transparent',
+//                                             color: active ? tokens.surface : tokens.secondary,
+//                                             borderColor: active ? tokens.onSurface : tokens.outlineVariant,
+//                                         }}
+//                                     >
+//                                         <span aria-hidden="true">{CATEGORY_ICONS[ c ]}</span>
+//                                         {c}
+//                                     </button>
+//                                 );
+//                             })}
+//                         </div>
+//                     </div>
+//                 </div>
+
+//                 {/* ── Hero carousel (latest products, auto-scrolls) ── */}
+//                 {slideCount > 0 && (
+//                     <section
+//                         className="relative overflow-hidden"
+//                         style={{ backgroundColor: '#0f0d0a' }}
+//                         onMouseEnter={() => setPaused(true)}
+//                         onMouseLeave={() => setPaused(false)}
+//                         aria-roledescription="carousel"
+//                     >
+//                         <div
+//                             className="flex transition-transform duration-700 ease-in-out"
+//                             style={{ transform: `translateX(-${slide * 100}%)` }}
+//                         >
+//                             {latestProducts.map((p, i) => {
+//                                 const img = p.images?.[ 0 ]?.url;
+//                                 return (
+//                                     <div key={p._id} className="w-full flex-shrink-0 relative" aria-hidden={i !== slide}>
+//                                         <div
+//                                             className="absolute inset-0 opacity-40"
+//                                             style={{ backgroundImage: `radial-gradient(circle at 20% 20%, ${tokens.primary}55, transparent 45%)` }}
+//                                         />
+//                                         <div className="relative max-w-7xl mx-auto px-8 lg:px-16 xl:px-24 py-12 lg:py-16 grid md:grid-cols-2 gap-8 items-center min-h-[360px]">
+//                                             <div className="order-2 md:order-1">
+//                                                 <span className="text-[10px] uppercase tracking-[0.35em] font-medium mb-4 block" style={{ color: tokens.primary }}>
+//                                                     {i === 0 ? 'Just Landed' : 'New Arrival'} · {categoryOf(p)}
+//                                                 </span>
+//                                                 <h2
+//                                                     className="font-light leading-[1.05] mb-4"
+//                                                     style={{ fontFamily: "'Cormorant Garamond', serif", color: '#fbf9f6', fontSize: 'clamp(2rem, 5vw, 3.8rem)' }}
+//                                                 >
+//                                                     {p.title}
+//                                                 </h2>
+//                                                 <p className="text-sm leading-relaxed mb-6 max-w-md line-clamp-2" style={{ color: '#d8d4cd' }}>
+//                                                     {p.description}
+//                                                 </p>
+//                                                 <p className="text-sm mb-6 tracking-[0.15em]" style={{ color: tokens.primary }}>
+//                                                     {p.price?.currency} {p.price?.amount?.toLocaleString()}
+//                                                 </p>
+//                                                 <button
+//                                                     type="button"
+//                                                     onClick={() => navigate(`/product/${p._id}`)}
+//                                                     className="px-9 py-3.5 text-[11px] uppercase tracking-[0.25em] font-medium transition-opacity hover:opacity-80 cursor-pointer"
+//                                                     style={{ backgroundColor: tokens.primary, color: tokens.onSurface }}
+//                                                 >
+//                                                     Shop Now
+//                                                 </button>
+//                                             </div>
+//                                             <div className="order-1 md:order-2 flex justify-center">
+//                                                 <div className="w-48 sm:w-60 md:w-72 aspect-[4/5] overflow-hidden" style={{ backgroundColor: '#1b1c1a' }}>
+//                                                     {img && <img src={img} alt={p.title} className="w-full h-full object-cover" />}
+//                                                 </div>
+//                                             </div>
+//                                         </div>
+//                                     </div>
+//                                 );
+//                             })}
+//                         </div>
+
+//                         {slideCount > 1 && (
+//                             <>
+//                                 <button
+//                                     type="button"
+//                                     onClick={() => goTo(slide - 1)}
+//                                     aria-label="Previous slide"
+//                                     className="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 items-center justify-center rounded-full cursor-pointer"
+//                                     style={{ backgroundColor: 'rgba(255,255,255,0.15)', color: '#fff' }}
+//                                 >
+//                                     ‹
+//                                 </button>
+//                                 <button
+//                                     type="button"
+//                                     onClick={() => goTo(slide + 1)}
+//                                     aria-label="Next slide"
+//                                     className="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 items-center justify-center rounded-full cursor-pointer"
+//                                     style={{ backgroundColor: 'rgba(255,255,255,0.15)', color: '#fff' }}
+//                                 >
+//                                     ›
+//                                 </button>
+//                                 <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
+//                                     {latestProducts.map((_, i) => (
+//                                         <button
+//                                             key={i}
+//                                             type="button"
+//                                             onClick={() => setSlide(i)}
+//                                             aria-label={`Go to slide ${i + 1}`}
+//                                             className="h-1.5 rounded-full transition-all duration-300 cursor-pointer"
+//                                             style={{ width: i === slide ? 28 : 8, backgroundColor: i === slide ? tokens.primary : 'rgba(255,255,255,0.4)' }}
+//                                         />
+//                                     ))}
+//                                 </div>
+//                             </>
+//                         )}
+//                     </section>
+//                 )}
+
+//                 {/* ── Static hero (only when there are no products yet) ── */}
+//                 {slideCount === 0 && (
 //                 <section
 //                     className="relative overflow-hidden"
 //                     style={{ backgroundColor: '#0f0d0a' }}
@@ -113,6 +325,7 @@
 //                         </div>
 //                     </div>
 //                 </section>
+//                 )}
 
 //                 {/* ── Trust / Feature strip ── */}
 //                 <section className="border-b" style={{ borderColor: tokens.surfaceHighest }}>
@@ -137,13 +350,13 @@
 //                     {/* ── Section header ── */}
 //                     <div className="pt-20 pb-14 text-center flex flex-col items-center">
 //                         <span className="text-[10px] uppercase tracking-[0.24em] font-medium mb-6" style={{ color: tokens.primary }}>
-//                             The Collection
+//                             {activeCategory === 'All' ? 'The Collection' : activeCategory}
 //                         </span>
 //                         <h2
 //                             className="text-4xl lg:text-6xl font-light leading-tight mb-6"
 //                             style={{ fontFamily: "'Cormorant Garamond', serif", color: tokens.onSurface }}
 //                         >
-//                             Curated Archive
+//                             {query ? `Results for "${query}"` : activeCategory === 'All' ? 'All Products' : `${activeCategory} Collection`}
 //                         </h2>
 //                         <p className="max-w-xl mx-auto text-sm leading-relaxed" style={{ color: tokens.secondary }}>
 //                             Discover our latest curation of premium minimalist pieces, meticulously designed for effortless elegance and enduring quality.
@@ -151,9 +364,9 @@
 //                     </div>
 
 //                     {/* ── Product Grid ── */}
-//                     {products && products.length > 0 ? (
+//                     {filteredProducts.length > 0 ? (
 //                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-16 pb-32">
-//                             {products.map(product => {
+//                             {filteredProducts.map(product => {
 //                                 const imageUrl = product.images && product.images.length > 0
 //                                     ? product.images[ 0 ].url
 //                                     : '/snitch_editorial_warm.png';
@@ -233,11 +446,23 @@
 //                     ) : (
 //                         <div className="py-24 text-center flex flex-col items-center">
 //                             <h2 className="text-2xl mb-4" style={{ fontFamily: "'Cormorant Garamond', serif", color: tokens.onSurface }}>
-//                                 No pieces available.
+//                                 {products?.length ? 'No products found.' : 'No pieces available.'}
 //                             </h2>
-//                             <p className="max-w-md mx-auto text-sm leading-relaxed" style={{ color: tokens.secondary }}>
-//                                 We are currently preparing our next collection. Please check back later.
+//                             <p className="max-w-md mx-auto text-sm leading-relaxed mb-6" style={{ color: tokens.secondary }}>
+//                                 {products?.length
+//                                     ? 'Try a different search or pick another category.'
+//                                     : 'We are currently preparing our next collection. Please check back later.'}
 //                             </p>
+//                             {products?.length > 0 && (
+//                                 <button
+//                                     type="button"
+//                                     onClick={() => setSearchParams({}, { replace: true })}
+//                                     className="px-8 py-3 text-[11px] uppercase tracking-[0.2em] font-medium cursor-pointer"
+//                                     style={{ backgroundColor: tokens.onSurface, color: tokens.surface }}
+//                                 >
+//                                     Show all products
+//                                 </button>
+//                             )}
 //                         </div>
 //                     )}
 //                 </div>
@@ -341,11 +566,14 @@
 
 
 
+
 import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useProduct } from '../hooks/useProduct';
 import { Link, useNavigate, useSearchParams } from 'react-router';
 import { useTokens, useTheme } from '../../../app/ThemeContext';
+import HeartButton from '../../wishlist/components/HeartButton';
+import StarRating from '../../review/components/StarRating';
 
 const TruckIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round">
@@ -383,6 +611,16 @@ const CATEGORY_ICONS = {
 
 const HERO_INTERVAL = 4500;
 
+const SORT_OPTIONS = [
+    { value: 'newest', label: 'Newest first' },
+    { value: 'price-asc', label: 'Price: Low to High' },
+    { value: 'price-desc', label: 'Price: High to Low' },
+    { value: 'rating', label: 'Top rated' },
+];
+
+// A product is "out of stock" when it has variants and every one is at 0
+const isOutOfStock = (p) => (p.variants?.length ?? 0) > 0 && p.variants.every(v => (v.stock ?? 0) <= 0);
+
 const Home = () => {
     const products = useSelector(state => state.product.products);
     const user = useSelector(state => state.auth.user);
@@ -396,6 +634,11 @@ const Home = () => {
     const [ searchParams, setSearchParams ] = useSearchParams();
     const activeCategory = CATEGORIES.includes(searchParams.get('category')) ? searchParams.get('category') : 'All';
     const query = searchParams.get('q') || '';
+    const sort = SORT_OPTIONS.some(o => o.value === searchParams.get('sort')) ? searchParams.get('sort') : 'newest';
+    const minPrice = searchParams.get('min') || '';
+    const maxPrice = searchParams.get('max') || '';
+    const inStockOnly = searchParams.get('stock') === '1';
+    const hasFilters = !!(minPrice || maxPrice || inStockOnly || sort !== 'newest');
 
     const updateParams = (next) => {
         const params = new URLSearchParams(searchParams);
@@ -413,8 +656,12 @@ const Home = () => {
 
     const filteredProducts = useMemo(() => {
         const q = query.trim().toLowerCase();
-        return (products || []).filter(p => {
+        const list = (products || []).filter(p => {
             if (activeCategory !== 'All' && categoryOf(p) !== activeCategory) return false;
+            const price = p.price?.amount ?? 0;
+            if (minPrice !== '' && price < Number(minPrice)) return false;
+            if (maxPrice !== '' && price > Number(maxPrice)) return false;
+            if (inStockOnly && isOutOfStock(p)) return false;
             if (!q) return true;
             return (
                 p.title?.toLowerCase().includes(q) ||
@@ -422,7 +669,14 @@ const Home = () => {
                 categoryOf(p).toLowerCase().includes(q)
             );
         });
-    }, [ products, activeCategory, query ]);
+
+        const sorted = [ ...list ];
+        if (sort === 'price-asc') sorted.sort((a, b) => (a.price?.amount ?? 0) - (b.price?.amount ?? 0));
+        else if (sort === 'price-desc') sorted.sort((a, b) => (b.price?.amount ?? 0) - (a.price?.amount ?? 0));
+        else if (sort === 'rating') sorted.sort((a, b) => (b.rating?.avg ?? 0) - (a.rating?.avg ?? 0) || (b.rating?.count ?? 0) - (a.rating?.count ?? 0));
+        else sorted.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+        return sorted;
+    }, [ products, activeCategory, query, sort, minPrice, maxPrice, inStockOnly ]);
 
     // ── Hero carousel: always shows the newest products ──
     const latestProducts = useMemo(() => {
@@ -703,6 +957,72 @@ const Home = () => {
                         </p>
                     </div>
 
+                    {/* ── Sort & filter toolbar ── */}
+                    {products?.length > 0 && (
+                        <div className="flex flex-wrap items-end gap-x-6 gap-y-4 pb-8 mb-8 border-b" style={{ borderColor: tokens.surfaceHighest }}>
+                            <p className="text-[11px] uppercase tracking-[0.18em] mr-auto" style={{ color: tokens.muted }}>
+                                {filteredProducts.length} product{filteredProducts.length !== 1 ? 's' : ''}
+                            </p>
+
+                            <div className="flex flex-col gap-1">
+                                <label htmlFor="sort-select" className="text-[9px] uppercase tracking-[0.18em]" style={{ color: tokens.muted }}>Sort by</label>
+                                <select
+                                    id="sort-select"
+                                    value={sort}
+                                    onChange={(e) => updateParams({ sort: e.target.value === 'newest' ? '' : e.target.value })}
+                                    className="px-3 py-2 text-[12px] outline-none border cursor-pointer"
+                                    style={{ backgroundColor: tokens.surfaceLow, borderColor: tokens.outlineVariant, color: tokens.onSurface }}
+                                >
+                                    {SORT_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+                                </select>
+                            </div>
+
+                            <div className="flex flex-col gap-1">
+                                <span className="text-[9px] uppercase tracking-[0.18em]" style={{ color: tokens.muted }}>Price (INR)</span>
+                                <div className="flex items-center gap-2">
+                                    <input
+                                        id="price-min"
+                                        type="number" min="0" inputMode="numeric" placeholder="Min"
+                                        value={minPrice}
+                                        onChange={(e) => updateParams({ min: e.target.value })}
+                                        className="w-24 px-3 py-2 text-[12px] outline-none border"
+                                        style={{ backgroundColor: tokens.surfaceLow, borderColor: tokens.outlineVariant, color: tokens.onSurface }}
+                                    />
+                                    <span style={{ color: tokens.muted }}>–</span>
+                                    <input
+                                        id="price-max"
+                                        type="number" min="0" inputMode="numeric" placeholder="Max"
+                                        value={maxPrice}
+                                        onChange={(e) => updateParams({ max: e.target.value })}
+                                        className="w-24 px-3 py-2 text-[12px] outline-none border"
+                                        style={{ backgroundColor: tokens.surfaceLow, borderColor: tokens.outlineVariant, color: tokens.onSurface }}
+                                    />
+                                </div>
+                            </div>
+
+                            <label className="flex items-center gap-2 pb-2 text-[12px] cursor-pointer" style={{ color: tokens.secondary }}>
+                                <input
+                                    id="in-stock-only"
+                                    type="checkbox"
+                                    checked={inStockOnly}
+                                    onChange={(e) => updateParams({ stock: e.target.checked ? '1' : '' })}
+                                />
+                                In stock only
+                            </label>
+
+                            {hasFilters && (
+                                <button
+                                    type="button"
+                                    onClick={() => updateParams({ sort: '', min: '', max: '', stock: '' })}
+                                    className="pb-2 text-[11px] uppercase tracking-[0.15em] underline cursor-pointer"
+                                    style={{ color: tokens.secondary }}
+                                >
+                                    Reset
+                                </button>
+                            )}
+                        </div>
+                    )}
+
                     {/* ── Product Grid ── */}
                     {filteredProducts.length > 0 ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-16 pb-32">
@@ -715,6 +1035,7 @@ const Home = () => {
                                     .map(v => v.attributes?.color || v.attributes?.Color)
                                     .filter(Boolean);
                                 const uniqueColors = [ ...new Set(colorEntries) ];
+                                const soldOut = isOutOfStock(product);
 
                                 return (
                                     <div
@@ -726,7 +1047,17 @@ const Home = () => {
                                                 src={imageUrl}
                                                 alt={product.title}
                                                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                                style={soldOut ? { filter: 'grayscale(1)', opacity: 0.6 } : undefined}
                                             />
+                                            {soldOut && (
+                                                <span
+                                                    className="absolute top-3 left-3 px-3 py-1.5 text-[9px] uppercase tracking-[0.2em] font-semibold"
+                                                    style={{ backgroundColor: '#2e1616', color: '#ff9a94' }}
+                                                >
+                                                    Out of stock
+                                                </span>
+                                            )}
+                                            <HeartButton productId={product._id} className="absolute top-3 right-3" />
                                             <div
                                                 className="absolute inset-x-0 bottom-0 py-3 text-center text-[10px] uppercase tracking-[0.22em] font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                                                 style={{ backgroundColor: 'rgba(27,28,26,0.85)', color: '#fbf9f6' }}
@@ -743,6 +1074,15 @@ const Home = () => {
                                             >
                                                 {product.title}
                                             </h3>
+
+                                            {product.rating?.count > 0 && (
+                                                <div className="flex items-center gap-2">
+                                                    <StarRating value={product.rating.avg} size={12} />
+                                                    <span className="text-[11px]" style={{ color: tokens.muted }}>
+                                                        {product.rating.avg.toFixed(1)} ({product.rating.count})
+                                                    </span>
+                                                </div>
+                                            )}
 
                                             <p
                                                 className="text-[12px] line-clamp-2 leading-relaxed"

@@ -42,6 +42,52 @@
 
 
 
+// import mongoose from "mongoose";
+// import bcrypt from "bcryptjs";
+
+// const userSchema = new mongoose.Schema({
+//     email: { type: String, required: true, unique: true },
+//     contact: { type: String, required: false },
+//     password: {
+//         type: String,
+//         required: function () {
+//             return !this.googleId;
+//         }
+//     },
+//     fullname: { type: String, required: true },
+//     role: {
+//         type: String,
+//         enum: [ "buyer", "seller" ],
+//         default: "buyer"
+//     },
+//     googleId: {
+//         type: String,
+//     },
+//     resetPasswordToken: String,
+//     resetPasswordExpires: Date
+// })
+
+// userSchema.pre("save", async function () {
+//     if (!this.isModified("password")) return;
+
+//     const hash = await bcrypt.hash(this.password, 10);
+//     this.password = hash;
+// })
+
+
+// userSchema.methods.comparePassword = async function (password) {
+//     return await bcrypt.compare(password, this.password);
+// }
+
+
+// const userModel = mongoose.model('user', userSchema);
+
+// export default userModel;
+
+
+
+
+
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 
@@ -62,6 +108,16 @@ const userSchema = new mongoose.Schema({
     },
     googleId: {
         type: String,
+    },
+    // Saved delivery address (pre-fills checkout)
+    address: {
+        fullName: { type: String, trim: true, default: "" },
+        phone: { type: String, trim: true, default: "" },
+        addressLine1: { type: String, trim: true, default: "" },
+        addressLine2: { type: String, trim: true, default: "" },
+        city: { type: String, trim: true, default: "" },
+        state: { type: String, trim: true, default: "" },
+        pincode: { type: String, trim: true, default: "" }
     },
     resetPasswordToken: String,
     resetPasswordExpires: Date

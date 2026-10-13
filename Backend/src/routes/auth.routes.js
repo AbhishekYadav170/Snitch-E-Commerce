@@ -58,9 +58,73 @@
 
 
 
+// import { Router } from "express";
+// import { validateRegisterUser, validateLoginUser, validateForgotPassword, validateResetPassword } from "../validator/auth.validator.js";
+// import { getAllProduct, getMe, googleCallback, login, logout, register, forgotPassword, resetPassword } from "../controllers/auth.controller.js";
+// import passport from "passport";
+// import { config } from "../config/config.js";
+// import { authenticateUser } from "../middlewares/auth.middleware.js";
+
+// const router = Router();
+
+
+
+// router.post('/register', validateRegisterUser, register)
+
+// router.post("/login", validateLoginUser, login)
+
+// // Forgot / reset password
+// router.post("/forgot-password", validateForgotPassword, forgotPassword)
+// router.post("/reset-password/:token", validateResetPassword, resetPassword)
+
+
+// // /api/auth/google
+// router.get("/google",
+//     passport.authenticate("google", { scope: [ "profile", "email" ] }))
+
+// router.get("/google/callback",
+//     passport.authenticate("google", {
+//         session: false,
+//         failureRedirect: config.NODE_ENV == "development" ? "http://localhost:5173/login" : "/login"
+//     }),
+//     googleCallback,
+// )
+
+
+// /**
+//  * @route Get /api/auth/me
+//  * @description Get the authenticated user's [rofile
+//  * @acess Private
+//  */
+// router.get('/me', authenticateUser, getMe)
+
+// /**
+//  * @route POST /api/auth/logout
+//  * @description Log the user out by clearing the auth cookie
+//  * @access Private
+//  */
+// router.post('/logout', authenticateUser, logout)
+
+
+// /**
+//  * @route GET /api/product
+//  * @description Get all product
+//  * @access Public
+//  */
+// router.get("/", getAllProduct)
+
+
+
+// export default router;
+
+
+
+
+
+
 import { Router } from "express";
-import { validateRegisterUser, validateLoginUser, validateForgotPassword, validateResetPassword } from "../validator/auth.validator.js";
-import { getAllProduct, getMe, googleCallback, login, logout, register, forgotPassword, resetPassword } from "../controllers/auth.controller.js";
+import { validateRegisterUser, validateLoginUser, validateForgotPassword, validateResetPassword, validateUpdateProfile } from "../validator/auth.validator.js";
+import { getAllProduct, getMe, googleCallback, login, logout, register, forgotPassword, resetPassword, updateProfile } from "../controllers/auth.controller.js";
 import passport from "passport";
 import { config } from "../config/config.js";
 import { authenticateUser } from "../middlewares/auth.middleware.js";
@@ -97,6 +161,13 @@ router.get("/google/callback",
  * @acess Private
  */
 router.get('/me', authenticateUser, getMe)
+
+/**
+ * @route PUT /api/auth/profile
+ * @description Update name, contact and saved delivery address
+ * @access Private
+ */
+router.put('/profile', authenticateUser, validateUpdateProfile, updateProfile)
 
 /**
  * @route POST /api/auth/logout
