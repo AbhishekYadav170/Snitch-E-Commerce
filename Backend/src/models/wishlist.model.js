@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 
+
 const wishlistSchema = new mongoose.Schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,
@@ -14,6 +15,7 @@ const wishlistSchema = new mongoose.Schema({
         }
     ]
 }, { timestamps: true })
+
 
 const wishlistModel = mongoose.model("wishlist", wishlistSchema);
 
