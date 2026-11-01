@@ -334,17 +334,13 @@ import MyOrders from "../features/order/pages/MyOrders.jsx"
 import SellerOrders from "../features/order/pages/SellerOrders.jsx"
 import ForgotPassword from "../features/auth/pages/ForgotPassword";
 import ResetPassword from "../features/auth/pages/ResetPassword";
-// import Wishlist from "../features/wishlist/pages/Wishlist.jsx"
 import Wishlist from "../features/wishlist/pages/wishlist.jsx";
 import Profile from "../features/auth/pages/Profile.jsx"
 import AppLayout from "./AppLayout"
 
 
 export const routes = createBrowserRouter([
-    // {
-    //     path: "/",
-    //     element: <Home />
-    // },
+  
     {
         path: "/register",
         element: <Register />,
@@ -431,33 +427,3 @@ export const routes = createBrowserRouter([
 
 
 ])
-//     {
-//         path: "/product/:productId",
-//         element: <ProductDetail />
-//     },
-//     {
-//         path: "/cart",
-//         element:<Protected><Cart /></Protected>
-//     },
-//     {
-//         path: "/seller",
-//         children: [
-//             {
-//                 path:"/seller/create-product",
-//                 element: <Protected role="seller"><CreateProduct/></Protected>
-//             },
-//             {
-//                 path: "/seller/dashboard",
-//                 element: <Protected role="seller" >
-//                     <Dashboard />
-//                 </Protected>
-//             },
-//             {
-//                 path: "/seller/product/:productId",
-//                 element: <Protected role="seller" >
-//                     <SellerProductDetails/>
-//                 </Protected>
-//             }
-//         ]
-//     }
-
